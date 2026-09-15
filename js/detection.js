@@ -222,12 +222,7 @@ function detectQuad() {
   drawOverlay();
 }
 
-// A sudden jump while already locked (much larger than the jitter tolerance used to
-// confirm a new candidate) probably means a different contour got picked, not the
-// same document moving — it has to re-prove itself over `stableFrames` frames before
-// the lock actually moves there, same as an initial detection would.
 const MATCH_TOLERANCE_RATIO = 0.06;
-const RELOCK_JUMP_RATIO = 0.25;
 const SMOOTHING_ALPHA = 0.35;
 
 let candidateQuad = null;
@@ -254,48 +249,48 @@ function smoothQuad(previous, target) {
 
 // Debounces raw per-frame detections into a stable state.lastQuad: a fresh detection
 // needs `stableFrames` consecutive similar-enough frames before it's trusted, and an
-// existing lock survives up to `missGrace` consecutive frames with no detection at all
-// (a hand briefly crossing the frame, motion blur) before it's dropped. Without this,
-// state.lastQuad — and the "documento detectado" status/overlay it drives — flickered
-// on every single noisy frame even when the document itself wasn't moving.
+// existing lock (or an in-progress candidate) survives up to `missGrace` consecutive
+// frames with no detection at all (a hand briefly crossing the frame, motion blur,
+// autofocus hunting) before it's dropped. That grace period has to apply to *both*
+// phases — a single missed frame resetting the streak back to 0 while still
+// accumulating confidence made the streak nearly impossible to ever reach in practice,
+// since real camera footage rarely finds a clean quad on every single consecutive
+// frame even when the document itself is perfectly still. That was an actual shipped
+// bug (v0.5.0): auto-detection could never lock at all outside near-perfect conditions.
 function handleDetectionResult(rawQuad, canvasDiagonal) {
   if (rawQuad) {
     missStreak = 0;
 
     if (state.lastQuad) {
-      const withinJumpRange = quadsMatch(rawQuad, state.lastQuad, canvasDiagonal, RELOCK_JUMP_RATIO);
-      if (quadsMatch(rawQuad, candidateQuad, canvasDiagonal, MATCH_TOLERANCE_RATIO)) {
-        candidateStreak++;
-      } else {
-        candidateQuad = rawQuad;
-        candidateStreak = 1;
-      }
-      if (!withinJumpRange && candidateStreak < DET_PARAMS.stableFrames) {
-        return; // possible new document — wait for it to prove itself before moving the lock
-      }
+      // Already locked: ease toward every new detection. A single wrong/noisy frame
+      // only nudges the smoothed quad by SMOOTHING_ALPHA before the next good frame
+      // pulls it back, so this doesn't need its own re-confirmation gate.
       state.lastQuad = smoothQuad(state.lastQuad, rawQuad);
+      return;
+    }
+
+    if (quadsMatch(rawQuad, candidateQuad, canvasDiagonal, MATCH_TOLERANCE_RATIO)) {
+      candidateStreak++;
     } else {
-      if (quadsMatch(rawQuad, candidateQuad, canvasDiagonal, MATCH_TOLERANCE_RATIO)) {
-        candidateStreak++;
-      } else {
-        candidateQuad = rawQuad;
-        candidateStreak = 1;
-      }
-      if (candidateStreak >= DET_PARAMS.stableFrames) {
-        state.lastQuad = rawQuad.map(p => ({ x: p.x, y: p.y }));
-        setLocked(true);
-      }
+      candidateQuad = rawQuad;
+      candidateStreak = 1;
+    }
+    if (candidateStreak >= DET_PARAMS.stableFrames) {
+      state.lastQuad = rawQuad.map(p => ({ x: p.x, y: p.y }));
+      setLocked(true);
     }
   } else {
-    candidateQuad = null;
-    candidateStreak = 0;
-    if (state.lastQuad) {
-      missStreak++;
-      if (missStreak > DET_PARAMS.missGrace) {
+    missStreak++;
+    if (missStreak > DET_PARAMS.missGrace) {
+      candidateQuad = null;
+      candidateStreak = 0;
+      if (state.lastQuad) {
         state.lastQuad = null;
         setLocked(false);
       }
     }
+    // else: brief miss within the grace window — keep the existing lock (if any) and
+    // keep accumulating toward the existing candidate on the next successful frame.
   }
 }
 

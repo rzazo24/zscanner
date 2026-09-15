@@ -5,6 +5,23 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-09-16
+
+### Fixed
+
+- **Regresión de v0.5.0**: la auto-detección prácticamente dejaba de bloquear nunca.
+  El contador de frames consecutivos exigidos para confirmar un cuadrilátero se
+  reiniciaba a cero ante *cualquier* frame sin detección, incluso durante la propia
+  fase de acumulación — y en vídeo real es normal que algún frame suelto no
+  encuentre un contorno limpio (desenfoque, autoenfoque, parpadeo de exposición)
+  aunque el documento esté quieto, así que el contador casi nunca llegaba a los 4
+  frames necesarios. Ahora ese margen de tolerancia (`missGrace`) aplica también
+  antes de bloquear, no solo para mantener un bloqueo ya conseguido.
+- De paso, se simplifica la lógica de re-enganche: en vez de exigir que un salto
+  brusco mientras ya está bloqueado vuelva a demostrarse durante varios frames,
+  cualquier detección válida simplemente suaviza el cuadrilátero bloqueado hacia
+  ella — un frame puntual erróneo ya se corrige solo en el siguiente.
+
 ## [0.5.0] - 2026-09-16
 
 ### Added
@@ -97,7 +114,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/rzazo24/zscanner/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/rzazo24/zscanner/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/rzazo24/zscanner/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/rzazo24/zscanner/compare/v0.2.0...v0.3.0

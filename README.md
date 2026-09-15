@@ -1,5 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
+![Version](https://img.shields.io/badge/version-0.3.0-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -99,6 +100,10 @@ Y abrir `http://localhost:8000` en el navegador. La cámara requiere HTTPS o `lo
 
 Sin configuración de build: Vercel sirve `index.html`, `css/` y `js/` tal cual como
 sitio estático.
+
+## Historial de versiones
+
+Ver [CHANGELOG.md](CHANGELOG.md).
 
 ## Licencia
 

@@ -76,6 +76,21 @@ con el valor aplicándose en vivo al siguiente frame.
   claros o con poca luz pueden requerir el ajuste manual de esquinas.
 - Procesa un documento a la vez; no hay modo de captura por lotes ni PDF multipágina.
 
+## Posibles mejoras futuras
+
+- **Detección de esquinas por red neuronal en vez de Canny+contornos.** Apps como
+  CamScanner ya no usan visión clásica: entrenan una CNN ligera para predecir
+  directamente las 4 esquinas, lo que aguanta mucho mejor fondos de bajo contraste o
+  escenas con desorden. [DocAligner](https://github.com/DocsaidLab/DocAligner)
+  (Apache 2.0) es un proyecto open-source real que hace esto, exportado a ONNX, con
+  una demo que corre en el navegador vía `onnxruntime-web`. No es un simple añadido:
+  sería un modelo extra que descargar (además de OpenCV.js, no en su lugar), y las
+  implementaciones que existen usan un bundler porque el backend WASM rápido de
+  `onnxruntime-web` necesita cabeceras `Cross-Origin-Opener-Policy`/
+  `Cross-Origin-Embedder-Policy` para `SharedArrayBuffer` (configurables en Vercel sin
+  build step, pero no es un CDN-y-listo como OpenCV.js). Si se aborda, mejor como
+  modo opt-in (p. ej. `?ml=1`) que conviva con el pipeline clásico, no como reemplazo.
+
 ## Stack
 
 - Vanilla HTML/CSS/JS, sin frameworks ni build step. La lógica se separa en módulos ES

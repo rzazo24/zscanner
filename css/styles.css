@@ -26,7 +26,11 @@ html, body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  padding: 20px 16px 28px;
+  /* viewport-fit=cover lets the page draw under a notch/dynamic island/status bar —
+     env(safe-area-inset-*) reserves room for it instead of letting the header sit
+     underneath, and falls back to the plain value on anything that doesn't support it. */
+  padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(28px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 header {
   display: flex;

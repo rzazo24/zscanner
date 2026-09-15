@@ -5,6 +5,13 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+### Fixed
+
+- La cabecera ("ZScanner" + el punto de estado) quedaba tapada por el notch/isla
+  dinámica o la barra de estado del móvil, ya que `viewport-fit=cover` deja que la
+  página se dibuje debajo de esa zona. Se reserva espacio con
+  `env(safe-area-inset-*)` en el padding de `.app`.
+
 ## [0.4.0] - 2026-09-16
 
 ### Added

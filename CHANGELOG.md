@@ -5,6 +5,18 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-09-16
+
+### Fixed
+
+- Los botones circulares (cambiar cámara, ajustar esquinas manualmente, cancelar)
+  usaban símbolos Unicode sueltos (⟲ ▭ ✕) en vez de iconos propios, con dos
+  problemas: renderizaban de forma inconsistente entre dispositivos (a veces como
+  emoji a color, desalineados o con peso visual distinto entre sí), y su borde
+  (`--grid`) apenas se distinguía del fondo. Sustituidos por iconos SVG inline
+  (`stroke="currentColor"`, mismo patrón que BusYa/Disaster Watch) y borde
+  `--text-dim`, mucho más visible.
+
 ## [0.5.1] - 2026-09-16
 
 ### Fixed
@@ -114,7 +126,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.5.2...HEAD
+[0.5.2]: https://github.com/rzazo24/zscanner/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/rzazo24/zscanner/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/rzazo24/zscanner/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/rzazo24/zscanner/compare/v0.3.0...v0.4.0

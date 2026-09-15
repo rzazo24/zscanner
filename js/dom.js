@@ -24,3 +24,5 @@ export const adjustHint = document.getElementById('adjust-hint');
 export const adjustControls = document.getElementById('adjust-controls');
 export const adjustCancelBtn = document.getElementById('adjust-cancel');
 export const adjustConfirmBtn = document.getElementById('adjust-confirm');
+export const updateBanner = document.getElementById('update-banner');
+export const updateReloadBtn = document.getElementById('update-reload-btn');

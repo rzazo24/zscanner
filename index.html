@@ -2,9 +2,17 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>ZScanner · Escáner de documentos en el navegador</title>
+<meta name="description" content="Escáner de documentos en el navegador: detección automática con OpenCV.js, ajuste manual de esquinas y corrección de perspectiva. Sin backend.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0a0f0a">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ZScanner">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -67,6 +75,11 @@
       <button id="download-btn">Descargar PNG</button>
     </div>
   </div>
+</div>
+
+<div id="update-banner" class="update-banner" hidden role="status" aria-live="polite">
+  <span>Hay una versión nueva de ZScanner disponible.</span>
+  <button id="update-reload-btn" type="button">Recargar</button>
 </div>
 
 <script type="module" src="js/main.js"></script>

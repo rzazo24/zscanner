@@ -1,6 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
-![Version](https://img.shields.io/badge/version-0.3.0-3ef27a?style=flat)
+![Version](https://img.shields.io/badge/version-0.4.0-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -35,6 +35,12 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
   antes de aplicar la corrección de perspectiva.
 - El resultado se puede ver en tres modos — blanco y negro (`adaptiveThreshold`), escala
   de grises o color — y descargarse como PNG.
+- Es una PWA instalable en el móvil (icono en pantalla de inicio, pantalla completa sin
+  barra del navegador). Un service worker (`sw.js`) cachea el shell estático de la app
+  (HTML/CSS/JS/iconos) con estrategia stale-while-revalidate, para que cargue al instante
+  y la interfaz funcione sin conexión en visitas repetidas; si detecta una versión nueva
+  mientras la app está abierta, muestra un aviso con un botón para recargar en vez de
+  hacerlo solo (podría cortar una captura o un arrastre de esquinas en curso).
 
 ### Parámetros de detección ajustables
 
@@ -51,8 +57,11 @@ con el valor aplicándose en vivo al siguiente frame.
 
 ## Limitaciones conocidas
 
-- OpenCV.js pesa ~10 MB; la primera carga depende de la conexión y no hay caché
-  offline (no hay service worker, a diferencia de otros proyectos de la serie).
+- OpenCV.js pesa ~10 MB y se sirve desde un CDN de terceros: el service worker no lo
+  cachea a propósito (es cross-origin, y una respuesta opaca no permite distinguir un
+  fetch fallido de uno correcto), así que la primera carga en cada dispositivo depende de
+  la conexión. Se apoya en la caché HTTP normal del navegador (24h) para las recargas
+  siguientes.
 - La detección depende de contraste entre el documento y la superficie — fondos muy
   claros o con poca luz pueden requerir el ajuste manual de esquinas.
 - Procesa un documento a la vez; no hay modo de captura por lotes ni PDF multipágina.
@@ -62,6 +71,7 @@ con el valor aplicándose en vivo al siguiente frame.
 - Vanilla HTML/CSS/JS, sin frameworks ni build step. La lógica se separa en módulos ES
   nativos (`js/*.js` con `import`/`export`) que el navegador resuelve directamente, sin
   bundler.
+- PWA instalable: `manifest.webmanifest` + `sw.js`, sin ninguna librería de terceros.
 - Pensado para desplegarse como sitio estático en Vercel.
 
 ## Estructura
@@ -78,10 +88,14 @@ zscanner/
 │   ├── detection.js       # pipeline de OpenCV.js + parámetros ajustables
 │   ├── adjust.js          # esquinas arrastrables sobre el frame congelado
 │   ├── perspective.js      # warpPerspective + modos de salida + descarga
-│   └── main.js             # orquestación: carga de OpenCV.js y listeners de botones
+│   └── main.js             # orquestación: carga de OpenCV.js, SW y listeners de botones
+├── icons/                  # iconos de la PWA (192/512/512-maskable/apple-touch-icon)
 ├── index.html
 ├── favicon.svg
+├── manifest.webmanifest
+├── sw.js                   # service worker: cachea el shell estático, nunca OpenCV.js
 ├── LICENSE
+├── CHANGELOG.md
 └── README.md
 ```
 

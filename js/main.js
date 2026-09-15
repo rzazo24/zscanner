@@ -5,7 +5,7 @@
 import {
   switchCamBtn, shutterBtn, manualBtn, retakeBtn, adjustAgainBtn,
   adjustCancelBtn, adjustConfirmBtn, video, loadingOverlay, loadingText,
-  statusPill, stageLive, resultPanel,
+  statusPill, stageLive, resultPanel, updateBanner, updateReloadBtn,
 } from './dom.js';
 import { state } from './state.js';
 import { showLiveStage, backToResultFromAdjust } from './ui.js';
@@ -103,3 +103,41 @@ retakeBtn.addEventListener('click', () => {
 });
 
 window.addEventListener('resize', () => { if (video.videoWidth) sizeCanvases(); });
+
+// --- PWA: install via manifest.webmanifest, offline shell via sw.js ---
+
+if ('serviceWorker' in navigator) {
+  // On a first-ever visit there's no controller yet; sw.js's own clients.claim() makes
+  // that first install also fire "controllerchange" below, even though it isn't a real
+  // update. Without this check, everyone's first visit would show the "new version"
+  // banner for no reason.
+  const hadControllerBeforeRegister = Boolean(navigator.serviceWorker.controller);
+
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch((err) => console.error('SW registration failed', err));
+  });
+
+  // sw.js calls skipWaiting()/clients.claim(), so a new version takes control of an
+  // already-open tab immediately — but that tab is still running the old html/css/js
+  // already loaded in memory until it reloads. "controllerchange" fires at exactly that
+  // moment; instead of reloading on its own (could cut off a capture or a drag in
+  // progress), it shows a banner with a button and reloads when the user chooses to.
+  let updateAvailable = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (updateAvailable || !hadControllerBeforeRegister) return;
+    updateAvailable = true;
+    updateBanner.hidden = false;
+  });
+
+  updateReloadBtn.addEventListener('click', () => window.location.reload());
+
+  // The browser only checks sw.js for changes on its own schedule (roughly every 24h, or
+  // on navigation) — for a PWA reopened from the background instead of freshly navigated
+  // to, that can leave it stale much longer than intended. Re-checking whenever the tab
+  // becomes visible again catches updates sooner.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      navigator.serviceWorker.getRegistration().then((reg) => reg && reg.update());
+    }
+  });
+}

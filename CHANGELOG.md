@@ -5,6 +5,22 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-16
+
+### Added
+
+- PWA instalable, pensada para uso en el móvil: `manifest.webmanifest`, iconos
+  (192/512/512-maskable/apple-touch-icon) e íconos de instalación en la misma
+  identidad visual del resto de la serie.
+- Service worker (`sw.js`) que cachea el shell estático (HTML/CSS/JS/iconos) con
+  estrategia stale-while-revalidate, para carga instantánea y funcionamiento sin
+  conexión en visitas repetidas. Deliberadamente no cachea OpenCV.js (CDN de
+  terceros, cross-origin): una respuesta opaca no permite distinguir un fetch
+  fallido de uno correcto, así que se apoya en la caché HTTP normal del navegador.
+- Aviso de "versión nueva disponible" con botón de recarga manual cuando el
+  service worker detecta una actualización mientras la app sigue abierta, en vez
+  de recargar sola y cortar una captura o un arrastre de esquinas en curso.
+
 ## [0.3.0] - 2026-09-16
 
 ### Changed
@@ -55,7 +71,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/rzazo24/zscanner/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/rzazo24/zscanner/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/rzazo24/zscanner/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/rzazo24/zscanner/releases/tag/v0.1.0

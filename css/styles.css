@@ -285,3 +285,30 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
   animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+.update-banner {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 30;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 16px max(10px, env(safe-area-inset-bottom));
+  background: var(--panel-bg);
+  border-top: 1px solid var(--accent);
+  color: var(--text);
+  font-size: 0.8rem;
+}
+.update-banner:not([hidden]) { display: flex; }
+.update-banner button {
+  padding: 6px 16px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  background: var(--accent);
+  color: #06170a;
+  font-size: 0.78rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}

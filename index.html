@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ZScanner · Escáner de documentos en el navegador</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div id="loading-text">Cargando el motor de visión…</div>
+</div>
+
+<div class="app">
+  <header>
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <h1>ZScanner</h1>
+    </div>
+    <span id="status-pill">iniciando</span>
+  </header>
+
+  <div id="stage-live" class="stage">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="overlay" class="layer"></canvas>
+    <div class="corner-hint"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
+    <div class="sweep"></div>
+  </div>
+
+  <div id="stage-adjust" class="stage hidden">
+    <canvas id="adjust-canvas" class="layer"></canvas>
+    <canvas id="adjust-overlay" class="layer"></canvas>
+  </div>
+
+  <div class="hint-text" id="hint-text">Apunta a un documento sobre una superficie con contraste.</div>
+  <div class="hint-text" id="adjust-hint" style="display:none;">Arrastra las esquinas para ajustar el recorte.</div>
+
+  <div class="controls" id="live-controls">
+    <button class="icon-btn" id="switch-cam" title="Cambiar cámara">⟲</button>
+    <button id="shutter" title="Capturar"></button>
+    <button class="icon-btn" id="manual-capture" title="Ajustar esquinas manualmente">▭</button>
+  </div>
+
+  <div class="controls" id="adjust-controls" style="display:none;">
+    <button class="icon-btn" id="adjust-cancel" title="Cancelar">✕</button>
+    <button id="adjust-confirm" title="Usar este recorte">✓</button>
+  </div>
+
+  <div class="result-panel" id="result-panel">
+    <div class="mode-toggle">
+      <button data-mode="bw" class="active">Blanco y negro</button>
+      <button data-mode="gray">Escala de grises</button>
+      <button data-mode="color">Color</button>
+    </div>
+    <div id="result-canvas-wrap">
+      <canvas id="result-canvas"></canvas>
+    </div>
+    <div class="result-actions">
+      <button id="retake-btn">Repetir</button>
+      <button id="adjust-again-btn">Ajustar</button>
+      <button id="download-btn">Descargar PNG</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

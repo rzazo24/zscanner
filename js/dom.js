@@ -1,0 +1,26 @@
+// Single source of truth for DOM element lookups, so every other module
+// imports references instead of re-querying the document.
+
+export const video = document.getElementById('video');
+export const overlay = document.getElementById('overlay');
+export const stageLive = document.getElementById('stage-live');
+export const statusPill = document.getElementById('status-pill');
+export const hintText = document.getElementById('hint-text');
+export const shutterBtn = document.getElementById('shutter');
+export const manualBtn = document.getElementById('manual-capture');
+export const switchCamBtn = document.getElementById('switch-cam');
+export const liveControls = document.getElementById('live-controls');
+export const resultPanel = document.getElementById('result-panel');
+export const resultCanvas = document.getElementById('result-canvas');
+export const retakeBtn = document.getElementById('retake-btn');
+export const adjustAgainBtn = document.getElementById('adjust-again-btn');
+export const downloadBtn = document.getElementById('download-btn');
+export const loadingOverlay = document.getElementById('loading-overlay');
+export const loadingText = document.getElementById('loading-text');
+export const stageAdjust = document.getElementById('stage-adjust');
+export const adjustCanvas = document.getElementById('adjust-canvas');
+export const adjustOverlay = document.getElementById('adjust-overlay');
+export const adjustHint = document.getElementById('adjust-hint');
+export const adjustControls = document.getElementById('adjust-controls');
+export const adjustCancelBtn = document.getElementById('adjust-cancel');
+export const adjustConfirmBtn = document.getElementById('adjust-confirm');

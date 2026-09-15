@@ -1,6 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
-![Version](https://img.shields.io/badge/version-0.4.0-3ef27a?style=flat)
+![Version](https://img.shields.io/badge/version-0.5.0-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -26,6 +26,14 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
   corre el documento a través de OpenCV.js: gris → `GaussianBlur` → `Canny` →
   `findContours` → `approxPolyDP`, buscando el cuadrilátero convexo más grande. El
   contorno detectado se dibuja en tiempo real sobre el preview.
+- Los umbrales de `Canny` se recalculan en cada frame a partir de la mediana de brillo de
+  la imagen (heurística estándar, sigma=0.33), en vez de usar un par de valores fijos —
+  así la detección se adapta sola a luz mala o poco contraste en vez de depender de un
+  ajuste manual único que solo funciona bien en una escena.
+- La detección exige varios frames consecutivos con un cuadrilátero similar antes de
+  marcarlo como "detectado" (evita que el estado parpadee con ruido puntual), y tolera
+  unos cuantos frames sin detección antes de soltar el bloqueo (una mano cruzando el
+  encuadre, un poco de desenfoque de movimiento) en vez de perderlo al instante.
 - Con el documento detectado, el disparador captura directamente: recorta con
   `getPerspectiveTransform` + `warpPerspective` usando las 4 esquinas encontradas,
   escaladas a resolución completa.
@@ -44,12 +52,14 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
 
 ### Parámetros de detección ajustables
 
-El área mínima del contorno, los umbrales de `Canny`, el tamaño del blur y el epsilon de
-`approxPolyDP` son overridables por query string, para probar valores distintos sin tocar
-código:
+El área mínima del contorno, el tamaño del blur, el epsilon de `approxPolyDP`, y los
+frames requeridos para bloquear/soltar la detección, son overridables por query string,
+para probar valores distintos sin tocar código. Pasar `cannyLow`/`cannyHigh` explícitos
+desactiva el cálculo automático por mediana y fuerza esos valores fijos (o desactívalo a
+mano con `autoCanny=0`):
 
 ```
-index.html?minArea=0.1&cannyLow=40&cannyHigh=120&blur=7&epsilon=0.015
+index.html?minArea=0.1&cannyLow=40&cannyHigh=120&blur=7&epsilon=0.015&stableFrames=3&missGrace=8
 ```
 
 Añadiendo `?debug=1` aparece además un panel con sliders para los mismos parámetros,

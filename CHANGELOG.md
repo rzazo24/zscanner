@@ -5,12 +5,31 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-09-16
+
+### Added
+
+- Umbrales de `Canny` calculados en cada frame a partir de la mediana de brillo de la
+  imagen (heurística sigma=0.33), en vez de un par de valores fijos — se adapta sola a
+  luz mala o poco contraste. Se puede forzar de vuelta a valores fijos con
+  `?cannyLow=`/`?cannyHigh=` explícitos, o desactivarlo a mano con `?autoCanny=0`.
+- Estabilidad temporal en la detección: un cuadrilátero necesita varios frames
+  consecutivos similares (`?stableFrames=`, 4 por defecto) antes de marcarse como
+  "detectado", y un bloqueo ya activo tolera varios frames seguidos sin detección
+  (`?missGrace=`, 6 por defecto) antes de soltarse — evita que el estado parpadee con
+  ruido puntual o una oclusión breve. El panel `?debug=1` incluye ahora un checkbox
+  para `autoCanny` (con lectura en vivo de los valores calculados) y sliders para los
+  dos parámetros nuevos.
+
 ### Fixed
 
 - La cabecera ("ZScanner" + el punto de estado) quedaba tapada por el notch/isla
   dinámica o la barra de estado del móvil, ya que `viewport-fit=cover` deja que la
   página se dibuje debajo de esa zona. Se reserva espacio con
   `env(safe-area-inset-*)` en el padding de `.app`.
+- El color del contorno detectado en la cámara en vivo se había quedado con el verde
+  del diseño anterior al rediseño de v0.3.0; ahora usa `--accent` como el resto de la
+  interfaz.
 
 ## [0.4.0] - 2026-09-16
 
@@ -78,7 +97,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/rzazo24/zscanner/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/rzazo24/zscanner/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/rzazo24/zscanner/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/rzazo24/zscanner/compare/v0.1.0...v0.2.0

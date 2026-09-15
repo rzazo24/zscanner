@@ -18,6 +18,8 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
 [BusYa](https://github.com/rzazo24/busya) (tiempos de paso EMT/CRTM) y
 [Disaster Watch](https://github.com/rzazo24/disaster-watch) (alertas globales GDACS).
 
+**Demo en vivo:** https://zscanner.vercel.app/
+
 ## Cómo funciona
 
 - La cámara trasera se abre con `getUserMedia` y, en cada frame, un bucle de detección

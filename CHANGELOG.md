@@ -5,6 +5,22 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.14.3] - 2026-09-16
+
+### Fixed
+
+- Los botones de "Repetir/Ajustar/+Página/Descargar" en la vista de resultado
+  volvían a desplazarse fuera de la pantalla en móviles bajos, esta vez al
+  finalizar una página *durante* una sesión multipágina: la barra de páginas y
+  el selector de modo (Mejorado/B-N/Grises/Color) se suman encima de la imagen
+  de resultado, y el límite `max-height: 60dvh` de esa imagen no tenía en cuenta
+  ese espacio extra (a diferencia del arreglo de `.stage` en v0.14.1, que sí lo
+  hace de forma dinámica). Se baja el límite a `44dvh` — verificado con
+  Playwright: con la barra de páginas y el selector de modo visibles a la vez en
+  un viewport de 667px, el botón más bajo pasa de desbordarse ~63px a quedar
+  ~44px por encima del borde; sin sesión multipágina activa sigue habiendo de
+  sobra (~120px de margen a 667px, ~220px a 844px).
+
 ## [0.14.2] - 2026-09-16
 
 ### Changed

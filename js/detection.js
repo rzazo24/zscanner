@@ -134,25 +134,10 @@ export function resizeDetectionCanvas(stageAspect) {
   detCanvas.height = Math.round(DET_W / stageAspect);
 }
 
-// The detection pipeline was never throttled — it ran once per requestAnimationFrame,
-// i.e. at the display's own refresh rate (up to 120Hz on ProMotion iPhones). That was
-// already more than document tracking needs, and became a real problem as the
-// pipeline grew heavier (CLAHE every frame, an occasional second Canny+contours pass
-// for the relaxed-threshold retry): sustained near-100% CPU at up to 120 runs/sec,
-// reported directly on iOS as the whole phone progressively slowing down until Safari
-// had to be force-closed — not a one-off glitch, a real thermal/CPU load problem.
-// ~10fps is still plenty responsive for tracking a document someone is holding (mostly)
-// still, and cuts sustained per-second work by roughly 6-12x depending on the device's
-// refresh rate.
-const DETECTION_INTERVAL_MS = 100;
-let lastDetectionTime = 0;
-
 export function runDetectionLoop() {
   if (state.detectLoopHandle) cancelAnimationFrame(state.detectLoopHandle);
-  lastDetectionTime = 0; // run the very first frame immediately, not after a delay
-  const step = (now) => {
-    if (video.readyState >= 2 && video._crop && now - lastDetectionTime >= DETECTION_INTERVAL_MS) {
-      lastDetectionTime = now;
+  const step = () => {
+    if (video.readyState >= 2 && video._crop) {
       detectQuad();
     }
     state.detectLoopHandle = requestAnimationFrame(step);

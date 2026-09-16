@@ -49,35 +49,6 @@ export function sizeCanvases() {
   resizeDetectionCanvas(stageAspect);
 }
 
-// getUserMedia's continuous video stream is capped well below a camera's real photo
-// resolution — it has to keep decoding/encoding frames in real time, so the browser
-// negotiates something far short of what the sensor can actually produce for a single
-// still shot (confirmed directly: a stream negotiated at 2400x2160 here, but
-// ImageCapture.takePhoto() on that same track returned 3840x2160 — a real capability
-// gap, not a hypothetical one). ImageCapture.takePhoto() asks the camera for one full-
-// resolution still instead of just reading the live stream's current frame, which is
-// what grabFullFrame() in adjust.js used to do exclusively. Chrome/Android supports
-// this; Safari does not define `ImageCapture` at all, so this must stay optional with
-// a plain video-frame fallback, not something callers can assume succeeds.
-export async function grabHighResPhoto() {
-  const track = state.currentStream?.getVideoTracks()[0];
-  if (!track || typeof ImageCapture === 'undefined') return null;
-  try {
-    const capture = new ImageCapture(track);
-    // Race against a timeout: a still-photo capture can stall indefinitely on some
-    // devices/drivers (autofocus hunting, camera briefly busy) — better to silently
-    // fall back to the ordinary video-frame snapshot than to leave the shutter
-    // looking hung for something that's meant to feel instant.
-    const blob = await Promise.race([
-      capture.takePhoto(),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('takePhoto timed out')), 4000)),
-    ]);
-    return await createImageBitmap(blob);
-  } catch (e) {
-    return null;
-  }
-}
-
 // A torch/flash toggle was tried here (v0.7.0) and reverted (v0.7.1): at normal
 // document-scanning distance, a phone's rear flash is a point source close enough to
 // the page to create a bright hotspot with sharp falloff, not even ambient light. That

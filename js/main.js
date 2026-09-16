@@ -88,17 +88,17 @@ switchCamBtn.addEventListener('click', async () => {
 // is also reachable from the result panel ("Ajustar") to fix a bad crop
 // without retaking the photo.
 
-shutterBtn.addEventListener('click', async () => {
+shutterBtn.addEventListener('click', () => {
   if (state.lastQuad) {
     captureDetected();
   } else {
-    const shot = await grabFullFrame();
+    const shot = grabFullFrame();
     enterAdjustMode(shot, bestGuessQuad(shot), 'live');
   }
 });
 
-manualBtn.addEventListener('click', async () => {
-  const shot = await grabFullFrame();
+manualBtn.addEventListener('click', () => {
+  const shot = grabFullFrame();
   enterAdjustMode(shot, bestGuessQuad(shot), 'live');
 });
 

@@ -8,8 +8,8 @@ import { grabFullFrame, quadFromDetection } from './adjust.js';
 
 // Fast path: a quad is already locked in, so warp straight to the result
 // without the extra confirmation tap.
-export async function captureDetected() {
-  const shot = await grabFullFrame();
+export function captureDetected() {
+  const shot = grabFullFrame();
   finalizeWarp(shot, quadFromDetection(shot));
 }
 

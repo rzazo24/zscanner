@@ -1,6 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
-![Version](https://img.shields.io/badge/version-0.14.4-3ef27a?style=flat)
+![Version](https://img.shields.io/badge/version-0.15.0-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -100,6 +100,10 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
   y la interfaz funcione sin conexión en visitas repetidas; si detecta una versión nueva
   mientras la app está abierta, muestra un aviso con un botón para recargar en vez de
   hacerlo solo (podría cortar una captura o un arrastre de esquinas en curso).
+- El visor de cámara mantiene siempre su tamaño; los botones de debajo se centran en
+  el espacio que quede libre hasta un pequeño pie de página con el enlace a este
+  repositorio, en vez de quedar pegados justo bajo el visor con un hueco vacío al
+  final en pantallas altas.
 
 ### Parámetros de detección ajustables
 

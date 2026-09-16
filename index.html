@@ -46,95 +46,108 @@
     <span id="status-pill">iniciando</span>
   </header>
 
-  <div id="pages-bar" class="pages-bar hidden">
-    <div id="pages-thumbs" class="pages-thumbs"></div>
-    <div class="pages-bar-actions">
-      <span id="pages-count">0 páginas</span>
-      <button id="finish-pdf-btn">Finalizar PDF</button>
+  <div class="scan-area">
+    <div id="pages-bar" class="pages-bar hidden">
+      <div id="pages-thumbs" class="pages-thumbs"></div>
+      <div class="pages-bar-actions">
+        <span id="pages-count">0 páginas</span>
+        <button id="finish-pdf-btn">Finalizar PDF</button>
+      </div>
+    </div>
+
+    <div id="stage-live" class="stage">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay" class="layer"></canvas>
+      <div class="corner-hint"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
+      <div class="sweep"></div>
+    </div>
+
+    <div id="stage-adjust" class="stage hidden">
+      <canvas id="adjust-canvas" class="layer"></canvas>
+      <canvas id="adjust-overlay" class="layer"></canvas>
+      <canvas id="adjust-magnifier" width="120" height="120"></canvas>
+    </div>
+
+    <div class="hint-text" id="hint-text">Apunta a un documento sobre una superficie con contraste.</div>
+    <div class="hint-text" id="adjust-hint" style="display:none;">Arrastra las esquinas para ajustar el recorte.</div>
+
+    <div class="controls-area">
+      <div class="controls" id="live-controls">
+        <div class="controls-side">
+          <button class="icon-btn" id="switch-cam" title="Cambiar cámara">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+          </button>
+        </div>
+        <button id="shutter" title="Capturar"></button>
+        <div class="controls-side">
+          <button class="icon-btn" id="manual-capture" title="Ajustar esquinas manualmente">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2v14a2 2 0 0 0 2 2h14"></path>
+              <path d="M18 22V8a2 2 0 0 0-2-2H2"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="controls-secondary" id="live-controls-secondary">
+        <button class="icon-btn" id="gallery-btn" title="Elegir foto de la galería">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+        </button>
+        <input type="file" id="gallery-input" accept="image/*" hidden>
+      </div>
+
+      <div class="controls" id="adjust-controls" style="display:none;">
+        <button class="icon-btn" id="adjust-cancel" title="Cancelar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <button id="adjust-confirm" title="Usar este recorte">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <div class="result-panel" id="result-panel">
+        <div class="mode-toggle">
+          <button data-mode="enhanced" class="active">Mejorado</button>
+          <button data-mode="bw">B/N</button>
+          <button data-mode="gray">Grises</button>
+          <button data-mode="color">Color</button>
+        </div>
+        <div id="result-canvas-wrap">
+          <canvas id="result-canvas"></canvas>
+        </div>
+        <div class="result-actions">
+          <button id="retake-btn">Repetir</button>
+          <button id="adjust-again-btn">Ajustar</button>
+        </div>
+        <div class="result-actions">
+          <button id="add-page-btn">+ Página</button>
+          <button id="download-btn">Descargar PNG</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div id="stage-live" class="stage">
-    <video id="video" autoplay playsinline muted></video>
-    <canvas id="overlay" class="layer"></canvas>
-    <div class="corner-hint"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
-    <div class="sweep"></div>
-  </div>
-
-  <div id="stage-adjust" class="stage hidden">
-    <canvas id="adjust-canvas" class="layer"></canvas>
-    <canvas id="adjust-overlay" class="layer"></canvas>
-    <canvas id="adjust-magnifier" width="120" height="120"></canvas>
-  </div>
-
-  <div class="hint-text" id="hint-text">Apunta a un documento sobre una superficie con contraste.</div>
-  <div class="hint-text" id="adjust-hint" style="display:none;">Arrastra las esquinas para ajustar el recorte.</div>
-
-  <div class="controls" id="live-controls">
-    <div class="controls-side">
-      <button class="icon-btn" id="switch-cam" title="Cambiar cámara">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="23 4 23 10 17 10"></polyline>
-          <polyline points="1 20 1 14 7 14"></polyline>
-          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-        </svg>
-      </button>
-    </div>
-    <button id="shutter" title="Capturar"></button>
-    <div class="controls-side">
-      <button class="icon-btn" id="manual-capture" title="Ajustar esquinas manualmente">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 2v14a2 2 0 0 0 2 2h14"></path>
-          <path d="M18 22V8a2 2 0 0 0-2-2H2"></path>
-        </svg>
-      </button>
-    </div>
-  </div>
-
-  <div class="controls-secondary" id="live-controls-secondary">
-    <button class="icon-btn" id="gallery-btn" title="Elegir foto de la galería">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-        <circle cx="8.5" cy="8.5" r="1.5"></circle>
-        <polyline points="21 15 16 10 5 21"></polyline>
+  <footer class="app-footer">
+    <a href="https://github.com/rzazo24/zscanner" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
       </svg>
-    </button>
-    <input type="file" id="gallery-input" accept="image/*" hidden>
-  </div>
-
-  <div class="controls" id="adjust-controls" style="display:none;">
-    <button class="icon-btn" id="adjust-cancel" title="Cancelar">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    </button>
-    <button id="adjust-confirm" title="Usar este recorte">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="20 6 9 17 4 12"></polyline>
-      </svg>
-    </button>
-  </div>
-
-  <div class="result-panel" id="result-panel">
-    <div class="mode-toggle">
-      <button data-mode="enhanced" class="active">Mejorado</button>
-      <button data-mode="bw">B/N</button>
-      <button data-mode="gray">Grises</button>
-      <button data-mode="color">Color</button>
-    </div>
-    <div id="result-canvas-wrap">
-      <canvas id="result-canvas"></canvas>
-    </div>
-    <div class="result-actions">
-      <button id="retake-btn">Repetir</button>
-      <button id="adjust-again-btn">Ajustar</button>
-    </div>
-    <div class="result-actions">
-      <button id="add-page-btn">+ Página</button>
-      <button id="download-btn">Descargar PNG</button>
-    </div>
-  </div>
+      <span>Código en GitHub</span>
+    </a>
+  </footer>
 </div>
 
 <div id="update-banner" class="update-banner" hidden role="status" aria-live="polite">

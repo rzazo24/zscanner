@@ -5,6 +5,26 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-09-16
+
+### Added
+
+- Footer con enlace al repositorio de GitHub, siempre visible al final de la app.
+
+### Changed
+
+- En pantallas más altas de lo estrictamente necesario, los botones (disparador,
+  galería, acciones del resultado) se quedaban pegados justo debajo del visor,
+  dejando un hueco vacío grande hasta abajo — poco simétrico. Ahora el visor
+  mantiene exactamente su tamaño y posición de siempre, y los botones se centran
+  en el espacio libre entre el texto de ayuda y el nuevo footer (`.controls-area`,
+  un `flex:1` anidado dentro del bloque de la pantalla en vez de aplicado al
+  bloque entero, para no afectar al visor). Verificado con Playwright en varios
+  altos de pantalla: sin cambios en el tamaño/posición del visor, botones
+  centrados con el mismo margen arriba y abajo, y sin desbordamiento en el
+  viewport más bajo probado (iPhone SE, 667px, con la barra de páginas y el
+  selector de modo visibles a la vez).
+
 ## [0.14.4] - 2026-09-16
 
 ### Fixed

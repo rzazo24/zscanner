@@ -30,7 +30,7 @@ html, body {
      env(safe-area-inset-*) reserves room for it instead of letting the header sit
      underneath, and falls back to the plain value on anything that doesn't support it. */
   padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
-    max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    max(14px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 header {
   display: flex;
@@ -38,6 +38,55 @@ header {
   justify-content: space-between;
   margin-bottom: 10px;
 }
+
+/* Everything between the header and the footer. flex:1 + min-height:0 lets this
+   shrink below its content's natural height on short viewports instead of
+   overflowing .app. The pages-bar/stage/hint-text inside keep their normal top
+   position and size (unaffected) — .controls-area below is the nested flex:1 child
+   that actually centers the buttons in whatever space is left under the stage. */
+.scan-area {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Wraps the button rows (and the result panel) so they center vertically in the
+   space between the stage/hint-text above and the footer below, instead of either
+   sitting flush under the stage (default) or flush against the footer. Nested
+   flex:1 inside .scan-area, not on .scan-area itself, specifically so the stage
+   above stays exactly where it was — only this block's contents get repositioned. */
+.controls-area {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Spacing between whichever of this block's children are visible together
+     (#live-controls + #live-controls-secondary) — using gap here instead of a
+     margin on the children themselves, so a leading/trailing margin doesn't throw
+     off the centering above (a margin on the first or last visible child would
+     count on one side only, making the leftover space split unevenly). */
+  gap: 6px;
+}
+
+.app-footer {
+  flex: none;
+  margin-top: 6px;
+  text-align: center;
+}
+.app-footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.app-footer a:hover { color: var(--accent); }
+.app-footer svg { width: 14px; height: 14px; }
 .brand {
   display: flex;
   align-items: center;
@@ -156,7 +205,6 @@ video { transform: scaleX(1); }
   justify-content: center;
   align-items: center;
   gap: 18px;
-  margin-top: 12px;
 }
 /* Grid instead of flex here specifically so #shutter stays dead-center regardless of
    how many icon buttons end up on each side — the two 1fr columns are always equal
@@ -180,7 +228,6 @@ video { transform: scaleX(1); }
 .controls-secondary {
   display: flex;
   justify-content: center;
-  margin-top: 8px;
 }
 button {
   font-family: inherit;
@@ -246,7 +293,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
   color: var(--text-dim);
   font-size: 0.8rem;
   letter-spacing: 0.2px;
-  margin-top: 8px;
+  margin-top: 6px;
   min-height: 1.2em;
 }
 

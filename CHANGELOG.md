@@ -5,6 +5,18 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.13.1] - 2026-09-16
+
+### Fixed
+
+- El disparador dejó de quedar centrado en la fila de controles al añadir el
+  botón de galería (quedaban 1 botón a su izquierda y 2 a su derecha, y un
+  `flex` simple no puede centrar un elemento así). `#live-controls` pasa a
+  usar una rejilla de 3 columnas (`1fr auto 1fr`) — los botones de cada lado
+  se agrupan en sus propias columnas, siempre del mismo ancho, así que el
+  disparador queda exactamente centrado sin importar cuántos botones haya a
+  cada lado.
+
 ## [0.13.0] - 2026-09-16
 
 ### Added
@@ -288,7 +300,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.13.0...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.13.1...HEAD
+[0.13.1]: https://github.com/rzazo24/zscanner/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/rzazo24/zscanner/compare/v0.12.2...v0.13.0
 [0.12.2]: https://github.com/rzazo24/zscanner/compare/v0.11.0...v0.12.2
 [0.11.0]: https://github.com/rzazo24/zscanner/compare/v0.10.0...v0.11.0

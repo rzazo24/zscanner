@@ -146,6 +146,21 @@ video { transform: scaleX(1); }
   gap: 18px;
   margin-top: 18px;
 }
+/* Grid instead of flex here specifically so #shutter stays dead-center regardless of
+   how many icon buttons end up on each side (currently 1 left, 2 right) — the two 1fr
+   columns are always equal width, which a plain flex row can't guarantee once the two
+   sides hold different numbers of buttons. */
+#live-controls {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 18px;
+}
+.controls-side {
+  display: flex;
+  gap: 18px;
+}
+#live-controls .controls-side:first-child { justify-content: flex-end; }
+#live-controls .controls-side:last-child { justify-content: flex-start; }
 button {
   font-family: inherit;
   border: none;

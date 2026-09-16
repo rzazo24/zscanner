@@ -25,6 +25,18 @@
   <div id="loading-text">Cargando el motor de visión…</div>
 </div>
 
+<div id="camera-priming" class="hidden">
+  <svg class="priming-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+    <circle cx="12" cy="13" r="4"></circle>
+  </svg>
+  <h2>ZScanner necesita tu cámara</h2>
+  <p>Para detectar y recortar el documento en tiempo real. Todo el procesado ocurre en
+    tu propio navegador — la imagen nunca sale de tu dispositivo.</p>
+  <button id="camera-priming-btn">Permitir acceso</button>
+  <p id="camera-priming-error" class="priming-error" hidden></p>
+</div>
+
 <div class="app">
   <header>
     <div class="brand">

@@ -5,6 +5,7 @@
 import {
   switchCamBtn, shutterBtn, manualBtn, retakeBtn, adjustAgainBtn,
   adjustCancelBtn, adjustConfirmBtn, video, loadingOverlay, loadingText,
+  cameraPriming, cameraPrimingBtn, cameraPrimingError,
   statusPill, stageLive, resultPanel, updateBanner, updateReloadBtn,
 } from './dom.js';
 import { state } from './state.js';
@@ -17,9 +18,9 @@ import { captureDetected, finalizeWarp } from './perspective.js';
 function onOpenCvReady() {
   // cv.js defines a global Module that resolves asynchronously.
   if (cv && cv['onRuntimeInitialized']) {
-    cv['onRuntimeInitialized'] = startCamera;
+    cv['onRuntimeInitialized'] = showCameraPriming;
   } else {
-    startCamera();
+    showCameraPriming();
   }
 }
 function onOpenCvError() {
@@ -38,17 +39,40 @@ function onOpenCvError() {
   document.head.appendChild(s);
 })();
 
-async function startCamera() {
+// The native browser "allow camera access?" prompt can't be styled or explained by
+// the page — it's deliberately outside web content's control, so a site can't design
+// it to trick someone into granting access. This screen is shown right before
+// triggering it instead, so the abrupt native dialog has some on-brand context before
+// it rather than popping up in the middle of a bare loading spinner.
+function showCameraPriming() {
   state.cvReady = true;
+  loadingOverlay.classList.add('hidden');
+  cameraPriming.classList.remove('hidden');
+}
+
+cameraPrimingBtn.addEventListener('click', startCamera);
+
+async function startCamera() {
+  cameraPrimingBtn.disabled = true;
+  cameraPrimingError.hidden = true;
   try {
     await openStream(state.facingMode);
-    loadingOverlay.classList.add('hidden');
+    cameraPriming.classList.add('hidden');
     statusPill.textContent = 'buscando';
     statusPill.className = 'searching';
     stageLive.classList.add('searching');
     runDetectionLoop();
   } catch (err) {
-    loadingText.textContent = 'No se pudo acceder a la cámara: ' + err.message;
+    // Most browsers won't re-show the native prompt once explicitly denied (it has to
+    // be reset from the site's permission settings) — worth saying so plainly instead
+    // of implying "Reintentar" will just pop the dialog again like a fresh request would.
+    cameraPrimingError.textContent = err.name === 'NotAllowedError'
+      ? 'Permiso denegado. Actívalo en los ajustes de cámara del navegador para este sitio y vuelve a intentarlo.'
+      : 'No se pudo acceder a la cámara: ' + err.message;
+    cameraPrimingError.hidden = false;
+    cameraPrimingBtn.textContent = 'Reintentar';
+  } finally {
+    cameraPrimingBtn.disabled = false;
   }
 }
 

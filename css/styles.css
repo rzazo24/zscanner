@@ -301,6 +301,44 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+#camera-priming {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 14px;
+  padding: 32px;
+  text-align: center;
+  z-index: 20;
+}
+#camera-priming.hidden { display: none; }
+.priming-icon { width: 56px; height: 56px; color: var(--accent); }
+#camera-priming h2 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--text);
+  margin: 0;
+}
+#camera-priming p {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  max-width: 320px;
+  line-height: 1.5;
+  margin: 0;
+}
+#camera-priming-btn {
+  margin-top: 6px;
+  padding: 13px 32px;
+  border-radius: 4px;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: #06170a;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.priming-error { color: var(--red); }
+
 .update-banner {
   position: fixed;
   left: 0; right: 0; bottom: 0;

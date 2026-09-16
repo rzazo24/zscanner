@@ -1,6 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
-![Version](https://img.shields.io/badge/version-0.9.1-3ef27a?style=flat)
+![Version](https://img.shields.io/badge/version-0.10.0-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -22,6 +22,11 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
 
 ## Cómo funciona
 
+- Antes de pedir permiso de cámara aparece una pantalla propia explicando para qué hace
+  falta ("todo el procesado ocurre en tu navegador, la imagen nunca sale de tu
+  dispositivo"). El diálogo nativo de "permitir acceso" del navegador no se puede
+  personalizar por seguridad — esta pantalla solo le da contexto antes de que aparezca,
+  en vez de que salte de golpe en mitad de una pantalla de carga en blanco.
 - La cámara trasera se abre con `getUserMedia` y, en cada frame, un bucle de detección
   corre el documento a través de OpenCV.js: gris → `GaussianBlur` → `Canny` →
   `findContours` → `approxPolyDP`, buscando el cuadrilátero convexo más grande. El

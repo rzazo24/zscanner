@@ -5,6 +5,14 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.15.1] - 2026-09-16
+
+### Changed
+
+- El footer del enlace a GitHub baja un poco más (separación respecto a los
+  controles de arriba) y su texto/icono se reducen de tamaño, para que pese
+  menos visualmente frente al resto de la interfaz.
+
 ## [0.15.0] - 2026-09-16
 
 ### Added

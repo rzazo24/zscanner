@@ -72,21 +72,21 @@ header {
 
 .app-footer {
   flex: none;
-  margin-top: 6px;
+  margin-top: 9px;
   text-align: center;
 }
 .app-footer a {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   color: var(--text-dim);
   text-decoration: none;
-  font-size: 0.72rem;
+  font-size: 0.62rem;
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
 .app-footer a:hover { color: var(--accent); }
-.app-footer svg { width: 14px; height: 14px; }
+.app-footer svg { width: 12px; height: 12px; }
 .brand {
   display: flex;
   align-items: center;

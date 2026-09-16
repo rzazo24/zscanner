@@ -2,7 +2,7 @@
 // shows 4 draggable handles over it, seeded from the detected quad (or a
 // centered default) before perspective.js applies the warp.
 
-import { video, adjustCanvas, adjustOverlay } from './dom.js';
+import { video, adjustCanvas, adjustOverlay, adjustMagnifier } from './dom.js';
 import { state } from './state.js';
 import { detCanvas } from './detection.js';
 import { showAdjustStage } from './ui.js';
@@ -25,6 +25,21 @@ export function quadFromDetection(shot) {
   const scaleX = shot.width / detCanvas.width;
   const scaleY = shot.height / detCanvas.height;
   return state.lastQuad.map(p => ({ x: p.x * scaleX, y: p.y * scaleY }));
+}
+
+// Like quadFromDetection, but falls back to this frame's raw (not yet confirmed
+// stable) detection when there's no locked quad — a much better starting point for
+// manual adjustment than a blank centered rectangle, even when confidence hasn't
+// reached the threshold needed to auto-capture. Only used to seed the adjust stage;
+// the fast auto-capture path still requires the fully-confirmed state.lastQuad via
+// quadFromDetection/captureDetected, so lowering this bar never affects capture
+// accuracy — just what the user starts dragging from.
+export function bestGuessQuad(shot) {
+  const source = state.lastQuad || state.rawQuad;
+  if (!source) return null;
+  const scaleX = shot.width / detCanvas.width;
+  const scaleY = shot.height / detCanvas.height;
+  return source.map(p => ({ x: p.x * scaleX, y: p.y * scaleY }));
 }
 
 export function defaultInsetQuad(w, h, margin = 0.03) {
@@ -107,12 +122,71 @@ function nearestCornerIndex(pt) {
   return best;
 }
 
+// --- Magnifier ---
+//
+// A finger covers the exact point it's trying to place — the single biggest
+// usability problem with touch-dragging a small target. Standard fix (Instagram,
+// Google Photos crop, etc.): show a zoomed loupe offset away from the touch point
+// while dragging, with a crosshair marking exactly where the corner will land.
+
+const MAGNIFIER_SIZE = 120; // CSS px, matches the canvas's own width/height attrs
+const MAGNIFIER_ZOOM = 2.5;
+const MAGNIFIER_OFFSET = 70; // CSS px between the touch point and the loupe's edge
+
+function updateMagnifier(e, canvasPt) {
+  const rect = adjustOverlay.getBoundingClientRect();
+  const touchX = e.clientX - rect.left;
+  const touchY = e.clientY - rect.top;
+
+  // Sits above the finger by default; flips below when too close to the top of the
+  // stage so the loupe itself never clips out of view.
+  let top = touchY - MAGNIFIER_OFFSET - MAGNIFIER_SIZE;
+  if (top < 0) top = touchY + MAGNIFIER_OFFSET;
+  let left = touchX - MAGNIFIER_SIZE / 2;
+  left = Math.min(Math.max(left, 0), rect.width - MAGNIFIER_SIZE);
+
+  adjustMagnifier.style.left = left + 'px';
+  adjustMagnifier.style.top = top + 'px';
+  adjustMagnifier.style.display = 'block';
+
+  // Sample a small square from the full-res image centered on the touch point, then
+  // scale it up to fill the loupe. Clamped to the image bounds (corners are very
+  // often near an edge, by definition) — when clamping shifts the sample window,
+  // the crosshair is repositioned to match so it still marks the true point, not
+  // just the loupe's center.
+  const cropSize = MAGNIFIER_SIZE / MAGNIFIER_ZOOM;
+  const half = cropSize / 2;
+  const maxSx = Math.max(0, adjustCanvas.width - cropSize);
+  const maxSy = Math.max(0, adjustCanvas.height - cropSize);
+  const sx = Math.min(Math.max(canvasPt.x - half, 0), maxSx);
+  const sy = Math.min(Math.max(canvasPt.y - half, 0), maxSy);
+
+  const mctx = adjustMagnifier.getContext('2d');
+  mctx.clearRect(0, 0, MAGNIFIER_SIZE, MAGNIFIER_SIZE);
+  mctx.drawImage(adjustCanvas, sx, sy, cropSize, cropSize, 0, 0, MAGNIFIER_SIZE, MAGNIFIER_SIZE);
+
+  const crossX = ((canvasPt.x - sx) / cropSize) * MAGNIFIER_SIZE;
+  const crossY = ((canvasPt.y - sy) / cropSize) * MAGNIFIER_SIZE;
+  mctx.strokeStyle = '#3ef27a';
+  mctx.lineWidth = 1.5;
+  mctx.beginPath();
+  mctx.moveTo(crossX - 8, crossY); mctx.lineTo(crossX + 8, crossY);
+  mctx.moveTo(crossX, crossY - 8); mctx.lineTo(crossX, crossY + 8);
+  mctx.stroke();
+}
+
+function hideMagnifier() {
+  adjustMagnifier.style.display = 'none';
+}
+
 adjustOverlay.addEventListener('pointerdown', (e) => {
   if (!state.adjustQuad) return;
-  const idx = nearestCornerIndex(pointerToCanvasCoords(e));
+  const pt = pointerToCanvasCoords(e);
+  const idx = nearestCornerIndex(pt);
   if (idx === -1) return;
   state.draggingCorner = idx;
   adjustOverlay.setPointerCapture(e.pointerId);
+  updateMagnifier(e, pt);
   e.preventDefault();
 });
 
@@ -124,12 +198,14 @@ adjustOverlay.addEventListener('pointermove', (e) => {
     y: Math.min(Math.max(pt.y, 0), adjustOverlay.height),
   };
   drawAdjustOverlay();
+  updateMagnifier(e, pt);
   e.preventDefault();
 });
 
 function endDrag(e) {
   if (state.draggingCorner === -1) return;
   state.draggingCorner = -1;
+  hideMagnifier();
   try { adjustOverlay.releasePointerCapture(e.pointerId); } catch (_) { /* already released */ }
 }
 adjustOverlay.addEventListener('pointerup', endDrag);

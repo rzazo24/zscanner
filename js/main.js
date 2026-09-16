@@ -11,7 +11,7 @@ import { state } from './state.js';
 import { showLiveStage, backToResultFromAdjust } from './ui.js';
 import { runDetectionLoop, setLocked } from './detection.js';
 import { openStream, sizeCanvases } from './camera.js';
-import { grabFullFrame, quadFromDetection, enterAdjustMode } from './adjust.js';
+import { grabFullFrame, bestGuessQuad, enterAdjustMode } from './adjust.js';
 import { captureDetected, finalizeWarp } from './perspective.js';
 
 function onOpenCvReady() {
@@ -68,13 +68,14 @@ shutterBtn.addEventListener('click', () => {
   if (state.lastQuad) {
     captureDetected();
   } else {
-    enterAdjustMode(grabFullFrame(), null, 'live');
+    const shot = grabFullFrame();
+    enterAdjustMode(shot, bestGuessQuad(shot), 'live');
   }
 });
 
 manualBtn.addEventListener('click', () => {
   const shot = grabFullFrame();
-  enterAdjustMode(shot, quadFromDetection(shot), 'live');
+  enterAdjustMode(shot, bestGuessQuad(shot), 'live');
 });
 
 adjustAgainBtn.addEventListener('click', () => {

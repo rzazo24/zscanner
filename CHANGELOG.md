@@ -5,6 +5,20 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-16
+
+### Added
+
+- Lupa de precisión al arrastrar una esquina en el ajuste manual: muestra un
+  recorte ampliado (2.5x) con mira exacta, desplazada por encima (o por debajo,
+  cerca del borde superior) del punto de contacto para no quedar tapada por el
+  propio dedo — el problema número uno de cualquier interfaz de recorte táctil.
+- El ajuste manual ahora parte de la mejor detección disponible aunque no haya
+  llegado a confirmarse como estable (`state.rawQuad`, expuesto cada frame junto
+  al `state.lastQuad` ya confirmado), en vez de forzar siempre un rectángulo
+  genérico centrado. No afecta a la captura automática — esa sigue exigiendo la
+  detección confirmada de siempre.
+
 ## [0.7.1] - 2026-09-16
 
 ### Removed
@@ -184,7 +198,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/rzazo24/zscanner/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/rzazo24/zscanner/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/rzazo24/zscanner/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/rzazo24/zscanner/compare/v0.5.2...v0.6.0

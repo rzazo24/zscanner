@@ -7,7 +7,9 @@ export const state = {
   cvReady: false,
   currentStream: null,
   facingMode: 'environment',
-  lastQuad: null,         // 4 points in DETECTION-canvas coordinates
+  lastQuad: null,         // 4 points in DETECTION-canvas coordinates, confirmed/stable only
+  rawQuad: null,          // this frame's raw detection, even if not yet confirmed stable —
+                          // a better seed for manual adjustment than a blank rectangle
   detectLoopHandle: null,
   currentMode: 'bw',
   lastWarpedMat: null,    // cv.Mat, RGBA, kept between mode switches

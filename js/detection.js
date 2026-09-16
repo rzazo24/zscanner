@@ -312,6 +312,9 @@ function detectQuad() {
     }
 
     const rawQuad = pts ? orderPoints(pts) : null;
+    // Exposed even when not yet (or no longer) confirmed stable, so the manual-adjust
+    // stage can seed itself from the best available guess instead of a blank rectangle.
+    state.rawQuad = rawQuad;
     handleDetectionResult(rawQuad, Math.hypot(detCanvas.width, detCanvas.height));
   } catch (e) {
     // Skip a frame silently if OpenCV throws (e.g. transient buffer state).

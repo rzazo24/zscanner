@@ -20,6 +20,7 @@ export const loadingText = document.getElementById('loading-text');
 export const stageAdjust = document.getElementById('stage-adjust');
 export const adjustCanvas = document.getElementById('adjust-canvas');
 export const adjustOverlay = document.getElementById('adjust-overlay');
+export const adjustMagnifier = document.getElementById('adjust-magnifier');
 export const adjustHint = document.getElementById('adjust-hint');
 export const adjustControls = document.getElementById('adjust-controls');
 export const adjustCancelBtn = document.getElementById('adjust-cancel');

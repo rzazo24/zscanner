@@ -5,6 +5,24 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-09-16
+
+### Added
+
+- Nuevo modo de salida "Mejorado", activado por defecto: aplana la iluminación
+  desigual/sombras y sube el contraste sin binarizar, a diferencia de "B/N"
+  (renombrado desde "Blanco y negro"). Es el mismo tipo de filtro que usa
+  CamScanner en su modo de blanco y negro — que pese al nombre no es una
+  binarización dura, sino gris continuo con fondo limpio. Técnica de
+  normalización de fondo: estima la iluminación con un desenfoque fuerte de
+  una copia dilatada, la resta de la imagen original, e invierte y normaliza
+  (estira el contraste) el resultado. Los tamaños de kernel escalan con la
+  resolución real de la imagen, verificado visualmente contra una imagen
+  sintética con degradado de sombra y ruido tipo sensor de cámara.
+- El selector de modo pasa de 3 a 4 botones ("Mejorado", "B/N", "Grises",
+  "Color"); etiquetas acortadas para que quepan en una fila sin desbordar en
+  móviles estrechos.
+
 ## [0.10.0] - 2026-09-16
 
 ### Added
@@ -239,7 +257,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/rzazo24/zscanner/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/rzazo24/zscanner/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/rzazo24/zscanner/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/rzazo24/zscanner/compare/v0.8.0...v0.9.0

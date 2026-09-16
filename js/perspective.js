@@ -50,6 +50,8 @@ export function finalizeWarp(shot, quad) {
 
 function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
 
+function toOdd(n) { n = Math.round(n); return n % 2 === 0 ? n + 1 : n; }
+
 // adaptiveThreshold's blockSize is a pixel count, not a proportion of the image — a
 // fixed value implicitly assumes a fixed capture resolution. 25 was tuned against the
 // ~1400px-wide shots this app used to produce; at the higher resolutions introduced in
@@ -59,9 +61,40 @@ function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
 // consistent regardless of capture resolution. Odd (required by adaptiveThreshold) and
 // clamped so unusually small/large crops don't push it to a degenerate value.
 function adaptiveBlockSize(width) {
-  let size = Math.round(width / 56); // 1400/56 = 25, the original tuned ratio
-  if (size % 2 === 0) size += 1;
-  return Math.min(Math.max(size, 11), 51);
+  return Math.min(Math.max(toOdd(width / 56), 11), 51); // 1400/56 = 25, the original tuned ratio
+}
+
+// "Mejorado": the CamScanner-style mode that flattens uneven lighting/shadows and
+// stretches contrast, but — unlike 'bw' — never binarizes, so text keeps smooth
+// (anti-aliased) edges instead of the jagged, speckle-prone look of adaptiveThreshold.
+// Classic background-normalization recipe: estimate the page's own illumination by
+// heavily blurring a dilated copy (this erases text/fine detail, keeping only the
+// large-scale lighting), subtract that estimate from the original to flatten it out,
+// then normalize (this is the "escalado" — a min/max contrast stretch) so the paper
+// reads as clean white and ink as dark. Kernel sizes scale with image width, same
+// reasoning as adaptiveBlockSize above — tuned by visual comparison against a
+// synthetic image with a real shadow gradient and camera-sensor-like noise, not
+// copied blind from a tutorial pinned to some other resolution.
+function enhancedGray(gray, width) {
+  const dilateSize = Math.max(3, toOdd(width / 200));
+  const medianSize = Math.max(3, toOdd(width / 70));
+  let kernel, dilated, bg, diff, inv, norm;
+  try {
+    kernel = cv.Mat.ones(dilateSize, dilateSize, cv.CV_8U);
+    dilated = new cv.Mat();
+    cv.dilate(gray, dilated, kernel);
+    bg = new cv.Mat();
+    cv.medianBlur(dilated, bg, medianSize);
+    diff = new cv.Mat();
+    cv.absdiff(gray, bg, diff);
+    inv = new cv.Mat();
+    cv.bitwise_not(diff, inv);
+    norm = new cv.Mat();
+    cv.normalize(inv, norm, 0, 255, cv.NORM_MINMAX);
+    return norm;
+  } finally {
+    [kernel, dilated, bg, diff, inv].forEach(m => m && m.delete());
+  }
 }
 
 export function renderResult() {
@@ -74,6 +107,10 @@ export function renderResult() {
     cv.cvtColor(state.lastWarpedMat, gray, cv.COLOR_RGBA2GRAY);
     if (state.currentMode === 'gray') {
       cv.cvtColor(gray, out, cv.COLOR_GRAY2RGBA);
+    } else if (state.currentMode === 'enhanced') {
+      const enhanced = enhancedGray(gray, state.lastWarpedMat.cols);
+      cv.cvtColor(enhanced, out, cv.COLOR_GRAY2RGBA);
+      enhanced.delete();
     } else {
       const blockSize = adaptiveBlockSize(state.lastWarpedMat.cols);
       let bw = new cv.Mat();

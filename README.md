@@ -1,6 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
-![Version](https://img.shields.io/badge/version-0.10.0-3ef27a?style=flat)
+![Version](https://img.shields.io/badge/version-0.11.0-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -63,9 +63,17 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
   rectángulo genérico centrado. Al arrastrar una esquina aparece una lupa con mira,
   desplazada para no quedar tapada por el dedo — el problema número uno de cualquier
   interfaz de recorte táctil.
-- El resultado se puede ver en tres modos — blanco y negro (`adaptiveThreshold`, con el
-  tamaño de bloque escalado a la resolución real del recorte para no verse ruidoso a
-  resoluciones de captura más altas), escala de grises o color — y descargarse como PNG.
+- El resultado se puede ver en cuatro modos, y descargarse como PNG:
+  - **Mejorado** (por defecto): aplana la iluminación desigual y sube el contraste sin
+    binarizar — el mismo tipo de filtro que el "B&N" de CamScanner, que en realidad no
+    es blanco y negro puro, sino gris continuo con fondo blanco limpio y sin el dentado
+    de una umbralización dura. Técnica clásica de normalización de fondo: estima la
+    iluminación con un desenfoque fuerte, la resta de la imagen original y estira el
+    contraste al resultado.
+  - **B/N**: umbralización adaptativa (`adaptiveThreshold`, con el tamaño de bloque
+    escalado a la resolución real del recorte para no verse ruidoso a resoluciones de
+    captura más altas) — blanco y negro puro, máximo contraste, archivo más pequeño.
+  - **Grises** y **Color**: sin procesado adicional.
 - Es una PWA instalable en el móvil (icono en pantalla de inicio, pantalla completa sin
   barra del navegador). Un service worker (`sw.js`) cachea el shell estático de la app
   (HTML/CSS/JS/iconos) con estrategia stale-while-revalidate, para que cargue al instante

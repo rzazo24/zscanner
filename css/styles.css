@@ -147,9 +147,9 @@ video { transform: scaleX(1); }
   margin-top: 18px;
 }
 /* Grid instead of flex here specifically so #shutter stays dead-center regardless of
-   how many icon buttons end up on each side (currently 1 left, 2 right) — the two 1fr
-   columns are always equal width, which a plain flex row can't guarantee once the two
-   sides hold different numbers of buttons. */
+   how many icon buttons end up on each side — the two 1fr columns are always equal
+   width, which a plain flex row can't guarantee once the two sides hold different
+   numbers of buttons (or even just to stay correct if that changes again later). */
 #live-controls {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -161,6 +161,15 @@ video { transform: scaleX(1); }
 }
 #live-controls .controls-side:first-child { justify-content: flex-end; }
 #live-controls .controls-side:last-child { justify-content: flex-start; }
+
+/* Gallery button lives on its own row, centered under the shutter, rather than
+   grouped with the other icon buttons — keeps live-controls symmetric (1 button each
+   side) instead of lopsided. */
+.controls-secondary {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
 button {
   font-family: inherit;
   border: none;

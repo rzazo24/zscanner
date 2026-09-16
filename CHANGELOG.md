@@ -5,6 +5,14 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.13.2] - 2026-09-16
+
+### Changed
+
+- El botón de galería pasa a su propia fila, centrado debajo del disparador,
+  en vez de ir agrupado con el de ajuste manual — deja la fila principal
+  simétrica (1 botón a cada lado del disparador).
+
 ## [0.13.1] - 2026-09-16
 
 ### Fixed
@@ -300,7 +308,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.13.1...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.13.2...HEAD
+[0.13.2]: https://github.com/rzazo24/zscanner/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/rzazo24/zscanner/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/rzazo24/zscanner/compare/v0.12.2...v0.13.0
 [0.12.2]: https://github.com/rzazo24/zscanner/compare/v0.11.0...v0.12.2

@@ -3,14 +3,14 @@
 // across the other modules.
 
 import {
-  switchCamBtn, torchBtn, shutterBtn, manualBtn, retakeBtn, adjustAgainBtn,
+  switchCamBtn, shutterBtn, manualBtn, retakeBtn, adjustAgainBtn,
   adjustCancelBtn, adjustConfirmBtn, video, loadingOverlay, loadingText,
   statusPill, stageLive, resultPanel, updateBanner, updateReloadBtn,
 } from './dom.js';
 import { state } from './state.js';
 import { showLiveStage, backToResultFromAdjust } from './ui.js';
 import { runDetectionLoop, setLocked } from './detection.js';
-import { openStream, sizeCanvases, getTorchSupport, setTorch } from './camera.js';
+import { openStream, sizeCanvases } from './camera.js';
 import { grabFullFrame, quadFromDetection, enterAdjustMode } from './adjust.js';
 import { captureDetected, finalizeWarp } from './perspective.js';
 
@@ -47,7 +47,6 @@ async function startCamera() {
     statusPill.className = 'searching';
     stageLive.classList.add('searching');
     runDetectionLoop();
-    refreshTorchAvailability();
   } catch (err) {
     loadingText.textContent = 'No se pudo acceder a la cámara: ' + err.message;
   }
@@ -55,31 +54,7 @@ async function startCamera() {
 
 switchCamBtn.addEventListener('click', async () => {
   state.facingMode = state.facingMode === 'environment' ? 'user' : 'environment';
-  try {
-    await openStream(state.facingMode);
-    refreshTorchAvailability();
-  } catch (e) { /* ignore */ }
-});
-
-// Torch (rear-camera flash used as a continuous light): most front cameras and
-// iOS Safari don't support it at all, so the button starts hidden and only
-// appears once openStream() confirms the current track actually has it — and
-// gets hidden again after switching to a camera that doesn't (e.g. the front one).
-let torchOn = false;
-
-function refreshTorchAvailability() {
-  torchOn = false;
-  torchBtn.classList.remove('active');
-  torchBtn.style.display = getTorchSupport() ? 'flex' : 'none';
-}
-
-torchBtn.addEventListener('click', async () => {
-  const next = !torchOn;
-  const ok = await setTorch(next);
-  if (ok) {
-    torchOn = next;
-    torchBtn.classList.toggle('active', torchOn);
-  }
+  try { await openStream(state.facingMode); } catch (e) { /* ignore */ }
 });
 
 // --- Capture, manual corner adjustment & perspective correction ---

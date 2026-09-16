@@ -251,7 +251,7 @@ const LOW_LIGHT_MEDIAN_THRESHOLD = 60;
 function updateLowLightHint(rawMedian) {
   if (state.lastQuad) return; // don't override "mantén el encuadre" while locked
   hintText.textContent = rawMedian < LOW_LIGHT_MEDIAN_THRESHOLD
-    ? 'Poca luz — acércate a una fuente de luz o activa el flash.'
+    ? 'Poca luz — busca una zona con más luz ambiente.'
     : 'Apunta a un documento sobre una superficie con contraste.';
 }
 

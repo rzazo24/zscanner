@@ -43,23 +43,10 @@ export function sizeCanvases() {
   resizeDetectionCanvas(stageAspect);
 }
 
-// Torch (rear camera flash used as a continuous light, not a photo flash) is exposed
-// as a track constraint, not a MediaStream API of its own — support is inconsistent
-// (most Android/Chrome rear cameras have it, iOS Safari and front cameras generally
-// don't), so callers must feature-detect via getTorchSupport() before showing any UI
-// for it rather than assuming it exists.
-export function getTorchSupport() {
-  const track = state.currentStream?.getVideoTracks()[0];
-  return Boolean(track?.getCapabilities?.().torch);
-}
-
-export async function setTorch(enabled) {
-  const track = state.currentStream?.getVideoTracks()[0];
-  if (!track) return false;
-  try {
-    await track.applyConstraints({ advanced: [{ torch: enabled }] });
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
+// A torch/flash toggle was tried here (v0.7.0) and reverted (v0.7.1): at normal
+// document-scanning distance, a phone's rear flash is a point source close enough to
+// the page to create a bright hotspot with sharp falloff, not even ambient light. That
+// both introduces strong spurious edges around the hotspot itself and skews the
+// auto-Canny median (see detection.js), and can even trigger the camera's auto-exposure
+// to darken the rest of the frame in response — confirmed worse in practice, not just
+// in theory. See CLAUDE.md for the longer version if this is ever reconsidered.

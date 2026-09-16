@@ -1,6 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
-![Version](https://img.shields.io/badge/version-0.7.0-3ef27a?style=flat)
+![Version](https://img.shields.io/badge/version-0.7.1-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -43,10 +43,7 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
   zonas) — ayuda mucho en habitaciones con poca luz, donde el documento está ahí pero
   con muy poco contraste, sin amplificar el ruido tanto como una ecualización global.
   Además, un aviso avisa cuando la escena en sí es demasiado oscura para que cualquier
-  procesado la arregle ("Poca luz — acércate a una fuente de luz o activa el flash").
-- Si el dispositivo tiene flash trasero, aparece un botón de linterna sobre la cámara
-  para usarlo como luz continua mientras se escanea (no todos los navegadores/cámaras
-  lo soportan — en ese caso el botón no aparece).
+  procesado la arregle ("Poca luz — busca una zona con más luz ambiente").
 - Con el documento detectado, el disparador captura directamente: recorta con
   `getPerspectiveTransform` + `warpPerspective` usando las 4 esquinas encontradas,
   escaladas a resolución completa.
@@ -88,7 +85,11 @@ con el valor aplicándose en vivo al siguiente frame.
 - La detección depende de contraste entre el documento y la superficie. CLAHE ayuda
   bastante cuando el problema es *poco contraste con luz suficiente*, pero no hay
   procesado que invente luz que la cámara nunca capturó — con muy poca luz real, sigue
-  haciendo falta el flash (si el dispositivo lo soporta) o el ajuste manual de esquinas.
+  haciendo falta buscar una zona más iluminada o el ajuste manual de esquinas. No se usa
+  el flash del móvil: a la distancia típica de escaneo crea un punto de luz muy intenso
+  con caída brusca hacia los bordes en vez de luz uniforme, lo que en la práctica
+  empeora la detección (bordes falsos alrededor del propio brillo) en vez de mejorarla
+  — se probó y se revirtió, ver [CHANGELOG](CHANGELOG.md).
 - Procesa un documento a la vez; no hay modo de captura por lotes ni PDF multipágina.
 
 ## Posibles mejoras futuras

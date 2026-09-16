@@ -9,7 +9,6 @@ export const hintText = document.getElementById('hint-text');
 export const shutterBtn = document.getElementById('shutter');
 export const manualBtn = document.getElementById('manual-capture');
 export const switchCamBtn = document.getElementById('switch-cam');
-export const torchBtn = document.getElementById('torch-btn');
 export const liveControls = document.getElementById('live-controls');
 export const resultPanel = document.getElementById('result-panel');
 export const resultCanvas = document.getElementById('result-canvas');

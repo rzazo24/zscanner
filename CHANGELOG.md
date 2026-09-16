@@ -5,6 +5,20 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-09-16
+
+### Removed
+
+- **Revertido el botón de linterna de v0.7.0**: probado en dispositivo real, activar
+  el flash empeora la detección en vez de ayudar. A la distancia típica de escaneo,
+  el flash del móvil es una fuente de luz puntual muy cerca del documento — crea un
+  punto muy brillante en el centro con caída brusca hacia los bordes (en vez de luz
+  ambiente uniforme), lo que genera bordes falsos alrededor del propio brillo y
+  descompensa el cálculo de la mediana usado por el Canny adaptativo. Es un problema
+  conocido en apps de escaneo de documentos — por eso ninguna las serias ofrece
+  "activar el flash mientras escaneas". El aviso de poca luz ya no sugiere activar
+  el flash, solo buscar una zona más iluminada.
+
 ## [0.7.0] - 2026-09-16
 
 ### Added
@@ -170,7 +184,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/rzazo24/zscanner/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/rzazo24/zscanner/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/rzazo24/zscanner/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/rzazo24/zscanner/compare/v0.5.1...v0.5.2

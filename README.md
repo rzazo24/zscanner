@@ -15,6 +15,9 @@ servidor. Toda la visión por computador (detección de bordes, contornos y
 `warpPerspective`) la hace [OpenCV.js](https://docs.opencv.org/4.9.0/opencv.js) cargado
 por CDN.
 
+<img src="docs/screenshot-result.png" alt="Vista de resultado de ZScanner: documento escaneado en modo Mejorado, con selector de modo y botones de repetir, ajustar, añadir página y descargar" width="360">
+
+
 Uno más de una serie de proyectos pequeños para portfolio, junto a
 [BusYa](https://github.com/rzazo24/busya) (tiempos de paso EMT/CRTM) y
 [Disaster Watch](https://github.com/rzazo24/disaster-watch) (alertas globales GDACS).

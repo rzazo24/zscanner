@@ -7,10 +7,19 @@ import { state } from './state.js';
 import { detCanvas } from './detection.js';
 import { showAdjustStage } from './ui.js';
 
-// Grab a full-resolution frame from the cropped (cover-mapped) video region.
+// ~300dpi for a full A4/letter page — the standard reasonable target for a document
+// scan meant to be read or OCR'd. Capped rather than uncapped: using the camera's raw
+// native resolution directly, uncapped, would mean a needlessly huge one-time
+// warpPerspective + output canvas on higher-end cameras for no visible benefit.
+const MAX_SHOT_WIDTH = 2400;
+
+// Grab a full-resolution frame from the cropped (cover-mapped) video region, at the
+// camera's own native resolution (up to MAX_SHOT_WIDTH) rather than a fixed size —
+// on a device whose camera can't reach that anyway, this just uses what's actually
+// available instead of pointlessly upscaling past the real source resolution.
 export function grabFullFrame() {
   const c = video._crop;
-  const fullW = 1400;
+  const fullW = Math.min(MAX_SHOT_WIDTH, Math.round(c.sw));
   const fullH = Math.round(fullW * (c.sh / c.sw));
   const shot = document.createElement('canvas');
   shot.width = fullW; shot.height = fullH;

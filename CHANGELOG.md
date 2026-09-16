@@ -5,6 +5,19 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-09-16
+
+### Changed
+
+- Resolución de captura aumentada: `getUserMedia` pasa a pedir ~2400×3200 (antes
+  1280×1706), y `grabFullFrame()` usa la resolución nativa real del recorte de
+  cámara (topada en ~2400px de ancho, ≈300dpi para un A4/carta — el estándar
+  razonable para lectura/OCR) en vez de un tamaño fijo de 1400px sin relación
+  con lo que la cámara podía dar realmente. La detección en vivo corre sobre
+  una copia reducida a 360px (`DET_W` en `detection.js`) independientemente de
+  esto, así que la resolución de captura no afecta a la velocidad del escaneo
+  en vivo — solo a la calidad del PNG final.
+
 ## [0.8.0] - 2026-09-16
 
 ### Added
@@ -198,7 +211,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/rzazo24/zscanner/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/rzazo24/zscanner/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/rzazo24/zscanner/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/rzazo24/zscanner/compare/v0.6.0...v0.7.0

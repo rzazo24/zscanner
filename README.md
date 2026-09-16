@@ -1,6 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
-![Version](https://img.shields.io/badge/version-0.8.0-3ef27a?style=flat)
+![Version](https://img.shields.io/badge/version-0.9.0-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -44,9 +44,12 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
   con muy poco contraste, sin amplificar el ruido tanto como una ecualización global.
   Además, un aviso avisa cuando la escena en sí es demasiado oscura para que cualquier
   procesado la arregle ("Poca luz — busca una zona con más luz ambiente").
-- Con el documento detectado, el disparador captura directamente: recorta con
-  `getPerspectiveTransform` + `warpPerspective` usando las 4 esquinas encontradas,
-  escaladas a resolución completa.
+- La cámara se pide a ~2400×3200 (antes 1280×1706) — la detección en vivo no se entera,
+  porque corre sobre una copia reducida a 360px, así que la resolución de captura no
+  afecta a la velocidad del escaneo en vivo, solo a la calidad del resultado final. Con
+  el documento detectado, el disparador captura directamente a la resolución nativa de
+  la cámara (topada en ~2400px de ancho, equivalente a un A4 a 300dpi): recorta con
+  `getPerspectiveTransform` + `warpPerspective` usando las 4 esquinas encontradas.
 - Si la detección automática falla, o si el resultado no queda bien encuadrado, hay una
   red de seguridad: el botón de encuadre manual (o "Ajustar" ya en el resultado) congela
   el frame y muestra las 4 esquinas como puntos arrastrables para corregirlas a mano

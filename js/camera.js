@@ -11,8 +11,14 @@ export async function openStream(mode) {
   if (state.currentStream) {
     state.currentStream.getTracks().forEach(t => t.stop());
   }
+  // `ideal` (not `min`/`exact`) is a soft constraint — the browser just picks its
+  // closest supported resolution to this, never throws for asking "too much". The
+  // live detection loop reads from a small downscaled canvas (see DET_W in
+  // detection.js) regardless of this, so a higher native resolution here doesn't
+  // slow down live detection at all — only the one-time capture/warp step gets
+  // bigger input, which is exactly what we want more of.
   state.currentStream = await navigator.mediaDevices.getUserMedia({
-    video: { facingMode: mode, width: { ideal: 1280 }, height: { ideal: 1706 } },
+    video: { facingMode: mode, width: { ideal: 2400 }, height: { ideal: 3200 } },
     audio: false
   });
   video.srcObject = state.currentStream;

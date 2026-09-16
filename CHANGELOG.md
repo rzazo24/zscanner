@@ -5,6 +5,24 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.14.1] - 2026-09-16
+
+### Fixed
+
+- En pantallas bajas (p. ej. iPhone SE, ~667px de alto), la barra de páginas de
+  la sesión multipágina empujaba el disparador y el botón de galería fuera del
+  viewport, dejándolos casi invisibles y sin poder tocarlos. El problema ya
+  existía en menor medida antes de la sesión multipágina (el espacio vertical
+  se había ido ajustando entre varios cambios anteriores), pero la nueva barra
+  lo hacía mucho más grave. Solución: el recuadro de la cámara (`.stage`) ahora
+  usa `width: min(100%, calc(52dvh * 0.75))` en vez de un ancho fijo al 100%,
+  con lo que se encoge proporcionalmente (ancho y alto a la vez, sin romper la
+  proporción 3:4) solo en viewports realmente bajos, además de recortar un
+  poco de espaciado vertical en varios elementos (cabecera, texto de ayuda,
+  controles, barra de páginas). Verificado con Playwright en 667px (antes:
+  ~119px de desbordamiento con la barra de páginas visible; ahora: ~19px de
+  margen) y en 844px (sin regresión, todo sigue cabiendo perfectamente).
+
 ## [0.14.0] - 2026-09-16
 
 ### Added

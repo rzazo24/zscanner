@@ -29,14 +29,14 @@ html, body {
   /* viewport-fit=cover lets the page draw under a notch/dynamic island/status bar —
      env(safe-area-inset-*) reserves room for it instead of letting the header sit
      underneath, and falls back to the plain value on anything that doesn't support it. */
-  padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
-    max(28px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 .brand {
   display: flex;
@@ -86,8 +86,20 @@ header h1 {
 
 .stage {
   position: relative;
-  width: 100%;
+  /* Full container width on tall-enough screens (min() picks 100% there), but shrinks
+     proportionally — width AND height together, aspect-ratio intact — once the
+     viewport is short enough that a full-width 3:4 box wouldn't leave room for
+     everything below it (header, hint text, controls, and the pages-bar when a
+     multi-page session is active). A plain `max-height` here would just crop the
+     video instead of shrinking the box, since width would stay pinned at 100% —
+     confirmed empirically, not assumed. 52dvh trims a little even on a ~844px-tall
+     phone (~14px narrower than full width, harmless), but is the value that keeps
+     ~20px of clearance below the controls at the shortest realistic viewport
+     (iPhone SE-class, 667px tall, with the pages-bar showing) — measured via
+     Playwright, not eyeballed. A less aggressive factor left that case overflowing. */
+  width: min(100%, calc(52dvh * 0.75));
   aspect-ratio: 3 / 4;
+  margin: 0 auto;
   background: #000;
   border-radius: 8px;
   overflow: hidden;
@@ -144,7 +156,7 @@ video { transform: scaleX(1); }
   justify-content: center;
   align-items: center;
   gap: 18px;
-  margin-top: 18px;
+  margin-top: 12px;
 }
 /* Grid instead of flex here specifically so #shutter stays dead-center regardless of
    how many icon buttons end up on each side — the two 1fr columns are always equal
@@ -168,7 +180,7 @@ video { transform: scaleX(1); }
 .controls-secondary {
   display: flex;
   justify-content: center;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 button {
   font-family: inherit;
@@ -234,7 +246,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
   color: var(--text-dim);
   font-size: 0.8rem;
   letter-spacing: 0.2px;
-  margin-top: 12px;
+  margin-top: 8px;
   min-height: 1.2em;
 }
 
@@ -397,8 +409,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 10px;
-  margin-bottom: 14px;
+  padding: 6px 10px;
+  margin-bottom: 10px;
   background: var(--panel-bg);
   border: 1px solid var(--grid);
   border-radius: 8px;
@@ -414,8 +426,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .page-thumb {
   position: relative;
   flex: none;
-  width: 34px;
-  height: 46px;
+  width: 28px;
+  height: 38px;
   border-radius: 3px;
   overflow: hidden;
   border: 1px solid var(--grid);

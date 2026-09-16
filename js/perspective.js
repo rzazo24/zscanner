@@ -50,6 +50,20 @@ export function finalizeWarp(shot, quad) {
 
 function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
 
+// adaptiveThreshold's blockSize is a pixel count, not a proportion of the image — a
+// fixed value implicitly assumes a fixed capture resolution. 25 was tuned against the
+// ~1400px-wide shots this app used to produce; at the higher resolutions introduced in
+// v0.9.0 (up to ~2400px), that same 25px window covers proportionally less of the
+// document, which reads as noisier/worse-looking output despite the higher pixel count.
+// Scaling it to the actual warped width keeps the *physical* neighborhood size roughly
+// consistent regardless of capture resolution. Odd (required by adaptiveThreshold) and
+// clamped so unusually small/large crops don't push it to a degenerate value.
+function adaptiveBlockSize(width) {
+  let size = Math.round(width / 56); // 1400/56 = 25, the original tuned ratio
+  if (size % 2 === 0) size += 1;
+  return Math.min(Math.max(size, 11), 51);
+}
+
 export function renderResult() {
   if (!state.lastWarpedMat) return;
   let out = new cv.Mat();
@@ -61,8 +75,9 @@ export function renderResult() {
     if (state.currentMode === 'gray') {
       cv.cvtColor(gray, out, cv.COLOR_GRAY2RGBA);
     } else {
+      const blockSize = adaptiveBlockSize(state.lastWarpedMat.cols);
       let bw = new cv.Mat();
-      cv.adaptiveThreshold(gray, bw, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 25, 12);
+      cv.adaptiveThreshold(gray, bw, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, blockSize, 12);
       cv.cvtColor(bw, out, cv.COLOR_GRAY2RGBA);
       bw.delete();
     }

@@ -5,6 +5,21 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-09-16
+
+### Fixed
+
+- **Regresión de v0.9.0**: el modo blanco y negro se veía con ruido tipo "sal y
+  pimienta" a las nuevas resoluciones de captura más altas. `adaptiveThreshold`
+  usaba un tamaño de bloque fijo en píxeles (25) implícitamente ajustado para la
+  resolución antigua (~1400px de ancho) — al subir la resolución de captura sin
+  tocar este valor, ese mismo bloque de 25px pasó a cubrir proporcionalmente
+  mucha menos área del documento, amplificando el ruido del sensor de la cámara
+  en vez de promediarlo. Ahora el tamaño de bloque escala con el ancho real del
+  recorte (a 1400px de ancho da exactamente 25, igual que antes; a 2400px da 43),
+  verificado visualmente contra una imagen sintética con ruido realista tipo
+  sensor de cámara: notablemente menos ruido sin perder nitidez en el texto.
+
 ## [0.9.0] - 2026-09-16
 
 ### Changed
@@ -211,7 +226,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.9.1...HEAD
+[0.9.1]: https://github.com/rzazo24/zscanner/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/rzazo24/zscanner/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/rzazo24/zscanner/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/rzazo24/zscanner/compare/v0.7.0...v0.7.1

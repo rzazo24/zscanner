@@ -17,4 +17,7 @@ export const state = {
   adjustQuad: null,       // 4 points in lastShotCanvas pixel coords, order tl,tr,br,bl
   adjustReturnTo: 'live', // where "cancelar" goes back to: 'live' or 'result'
   draggingCorner: -1,
+  pages: [],              // multi-page session: array of already-rendered <canvas>
+                          // elements (one per confirmed page), in the mode each was
+                          // in when added — see js/pages.js
 };

@@ -5,6 +5,27 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-09-16
+
+### Added
+
+- Sesión multipágina: el botón "+ Página" del resultado guarda la página actual
+  (en el modo de salida que tuviera en ese momento) y vuelve a la cámara para la
+  siguiente, en vez de forzar a descargar y empezar de cero cada vez. Una barra
+  de páginas (con miniaturas y botón de quitar por página) queda visible en
+  cualquier pantalla —cámara en vivo, ajuste o resultado— mientras la sesión
+  siga activa, independientemente de la lógica de cambio de pantalla habitual.
+- "Finalizar PDF" une todas las páginas guardadas en un único PDF (`jsPDF`,
+  cargado por CDN solo la primera vez que hace falta, no en cada visita), cada
+  página a su propio tamaño en píxeles en vez de forzar todas a un A4 fijo —
+  verificado directamente contra la API real de jsPDF, incluyendo páginas de
+  proporciones distintas dentro del mismo documento. Las imágenes se comprimen
+  como JPEG (calidad 0.92): son fotos de papel, no gráficos con colores planos,
+  así que la pérdida de PNG a JPEG es prácticamente imperceptible y el archivo
+  final pesa mucho menos con varias páginas de por medio.
+- "Descargar PNG" se mantiene sin cambios para quien solo quiera una página
+  suelta al instante, sin usar la sesión multipágina en absoluto.
+
 ## [0.13.3] - 2026-09-16
 
 ### Fixed
@@ -319,7 +340,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.13.3...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/rzazo24/zscanner/compare/v0.13.3...v0.14.0
 [0.13.3]: https://github.com/rzazo24/zscanner/compare/v0.13.2...v0.13.3
 [0.13.2]: https://github.com/rzazo24/zscanner/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/rzazo24/zscanner/compare/v0.13.0...v0.13.1

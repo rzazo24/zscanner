@@ -46,6 +46,14 @@
     <span id="status-pill">iniciando</span>
   </header>
 
+  <div id="pages-bar" class="pages-bar hidden">
+    <div id="pages-thumbs" class="pages-thumbs"></div>
+    <div class="pages-bar-actions">
+      <span id="pages-count">0 páginas</span>
+      <button id="finish-pdf-btn">Finalizar PDF</button>
+    </div>
+  </div>
+
   <div id="stage-live" class="stage">
     <video id="video" autoplay playsinline muted></video>
     <canvas id="overlay" class="layer"></canvas>
@@ -121,6 +129,9 @@
     <div class="result-actions">
       <button id="retake-btn">Repetir</button>
       <button id="adjust-again-btn">Ajustar</button>
+    </div>
+    <div class="result-actions">
+      <button id="add-page-btn">+ Página</button>
       <button id="download-btn">Descargar PNG</button>
     </div>
   </div>

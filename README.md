@@ -1,6 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
-![Version](https://img.shields.io/badge/version-0.13.3-3ef27a?style=flat)
+![Version](https://img.shields.io/badge/version-0.14.0-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -10,9 +10,10 @@
 
 Escáner de documentos que corre entero en el navegador: detecta el documento con la
 cámara, corrige la perspectiva y exporta un PNG limpio en blanco y negro, escala de
-grises o color — sin subir nada a ningún servidor. Toda la visión por computador
-(detección de bordes, contornos y `warpPerspective`) la hace [OpenCV.js](https://docs.opencv.org/4.9.0/opencv.js)
-cargado por CDN.
+grises o color — o un PDF con varias páginas de una tacada — sin subir nada a ningún
+servidor. Toda la visión por computador (detección de bordes, contornos y
+`warpPerspective`) la hace [OpenCV.js](https://docs.opencv.org/4.9.0/opencv.js) cargado
+por CDN.
 
 Uno más de una serie de proyectos pequeños para portfolio, junto a
 [BusYa](https://github.com/rzazo24/busya) (tiempos de paso EMT/CRTM) y
@@ -81,6 +82,13 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
     escalado a la resolución real del recorte para no verse ruidoso a resoluciones de
     captura más altas) — blanco y negro puro, máximo contraste, archivo más pequeño.
   - **Grises** y **Color**: sin procesado adicional.
+- Se pueden encadenar varias páginas en una misma sesión: el botón "+ Página" del
+  resultado la guarda (en el modo de salida que tuviera en ese momento) y vuelve a la
+  cámara para la siguiente, con una barra de miniaturas (quitar una página con su ×)
+  visible en cualquier pantalla mientras la sesión siga activa. "Finalizar PDF" junta
+  todas las páginas guardadas en un único PDF, cada página a su propio tamaño (no fuerza
+  un A4 si el recorte tuvo otra proporción) — usando [jsPDF](https://github.com/parallax/jsPDF)
+  cargado por CDN solo la primera vez que hace falta, no en cada visita.
 - Es una PWA instalable en el móvil (icono en pantalla de inicio, pantalla completa sin
   barra del navegador). Un service worker (`sw.js`) cachea el shell estático de la app
   (HTML/CSS/JS/iconos) con estrategia stale-while-revalidate, para que cargue al instante
@@ -118,7 +126,11 @@ con el valor aplicándose en vivo al siguiente frame.
   con caída brusca hacia los bordes en vez de luz uniforme, lo que en la práctica
   empeora la detección (bordes falsos alrededor del propio brillo) en vez de mejorarla
   — se probó y se revirtió, ver [CHANGELOG](CHANGELOG.md).
-- Procesa un documento a la vez; no hay modo de captura por lotes ni PDF multipágina.
+- La sesión multipágina guarda cada página como un `<canvas>` en memoria (nunca en
+  disco ni en el servidor) — funciona bien para el uso típico de escanear un puñado de
+  hojas, pero muchas páginas de alta resolución seguidas pueden notarse en RAM en un
+  móvil modesto. No hay un límite explícito de páginas ni una barra de progreso durante
+  la generación del PDF.
 
 ## Posibles mejoras futuras
 
@@ -140,7 +152,9 @@ con el valor aplicándose en vivo al siguiente frame.
 - Vanilla HTML/CSS/JS, sin frameworks ni build step. La lógica se separa en módulos ES
   nativos (`js/*.js` con `import`/`export`) que el navegador resuelve directamente, sin
   bundler.
-- PWA instalable: `manifest.webmanifest` + `sw.js`, sin ninguna librería de terceros.
+- PWA instalable: `manifest.webmanifest` + `sw.js`.
+- Única dependencia de terceros aparte de OpenCV.js: [jsPDF](https://github.com/parallax/jsPDF)
+  (CDN, cargado bajo demanda solo al generar un PDF multipágina).
 - Pensado para desplegarse como sitio estático en Vercel.
 
 ## Estructura
@@ -157,7 +171,8 @@ zscanner/
 │   ├── detection.js       # pipeline de OpenCV.js + parámetros ajustables
 │   ├── adjust.js          # esquinas arrastrables sobre el frame congelado
 │   ├── perspective.js      # warpPerspective + modos de salida + descarga
-│   └── main.js             # orquestación: carga de OpenCV.js, SW y listeners de botones
+│   ├── pages.js             # sesión multipágina: miniaturas + exportar PDF (jsPDF)
+│   └── main.js               # orquestación: carga de OpenCV.js, SW y listeners de botones
 ├── icons/                  # iconos de la PWA (192/512/512-maskable/apple-touch-icon)
 ├── index.html
 ├── favicon.svg

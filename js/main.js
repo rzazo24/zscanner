@@ -4,7 +4,7 @@
 
 import {
   switchCamBtn, shutterBtn, manualBtn, galleryBtn, galleryInput,
-  retakeBtn, adjustAgainBtn,
+  retakeBtn, adjustAgainBtn, addPageBtn, finishPdfBtn,
   adjustCancelBtn, adjustConfirmBtn, video, loadingOverlay, loadingText,
   cameraPriming, cameraPrimingBtn, cameraPrimingError,
   statusPill, stageLive, resultPanel, updateBanner, updateReloadBtn,
@@ -15,6 +15,7 @@ import { runDetectionLoop, setLocked } from './detection.js';
 import { openStream, sizeCanvases } from './camera.js';
 import { grabFullFrame, bestGuessQuad, enterAdjustMode, loadImageFile } from './adjust.js';
 import { captureDetected, finalizeWarp } from './perspective.js';
+import { addCurrentPageToSession, exportPagesAsPdf, clearPages } from './pages.js';
 
 function onOpenCvReady() {
   // cv.js defines a global Module that resolves asynchronously.
@@ -139,11 +140,37 @@ adjustConfirmBtn.addEventListener('click', () => {
   finalizeWarp(state.lastShotCanvas, state.adjustQuad);
 });
 
-retakeBtn.addEventListener('click', () => {
+// Shared by "Repetir" (discard this capture) and "+ Página" (keep it, then go
+// capture the next one) — both end up back at a fresh live view the same way.
+function resumeLiveScanning() {
   showLiveStage();
   state.lastQuad = null;
   setLocked(false);
   runDetectionLoop();
+}
+
+retakeBtn.addEventListener('click', resumeLiveScanning);
+
+addPageBtn.addEventListener('click', () => {
+  addCurrentPageToSession();
+  resumeLiveScanning();
+});
+
+finishPdfBtn.addEventListener('click', async () => {
+  finishPdfBtn.disabled = true;
+  const originalText = finishPdfBtn.textContent;
+  finishPdfBtn.textContent = 'Generando…';
+  try {
+    await exportPagesAsPdf();
+    clearPages(); // the session is "done" once its PDF has been handed off
+  } catch (e) {
+    finishPdfBtn.textContent = 'Error, reintenta';
+    setTimeout(() => { finishPdfBtn.textContent = originalText; }, 2000);
+    return;
+  } finally {
+    finishPdfBtn.disabled = false;
+  }
+  finishPdfBtn.textContent = originalText;
 });
 
 window.addEventListener('resize', () => { if (video.videoWidth) sizeCanvases(); });

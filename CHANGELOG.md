@@ -5,6 +5,24 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-09-16
+
+### Fixed
+
+- **Bug grave reportado en iOS: el teléfono entero se ralentizaba progresivamente
+  hasta tener que forzar el cierre**, sin llegar a completar una captura. El bucle
+  de detección nunca tuvo límite de fotogramas — corría una vez por
+  `requestAnimationFrame`, es decir, a la frecuencia de refresco de la propia
+  pantalla (hasta 120Hz en iPhones con pantalla ProMotion). Eso ya era más de lo
+  necesario desde el principio, y se volvió un problema real conforme el pipeline
+  se hizo más pesado (CLAHE en cada frame desde v0.7.0, un segundo pase de
+  Canny+contornos en algunos frames desde v0.6.0): CPU sostenida cerca del 100%
+  a hasta 120 ejecuciones por segundo, con el consiguiente calentamiento y
+  ralentización del dispositivo. Ahora la detección está limitada a ~10 fps —
+  de sobra para seguir un documento sujeto con la mano — verificado
+  directamente contando las ejecuciones reales del pipeline (antes sin tope,
+  ahora ~9.7 fps constantes).
+
 ## [0.12.0] - 2026-09-16
 
 ### Added
@@ -276,7 +294,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.12.1...HEAD
+[0.12.1]: https://github.com/rzazo24/zscanner/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/rzazo24/zscanner/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/rzazo24/zscanner/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/rzazo24/zscanner/compare/v0.9.1...v0.10.0

@@ -41,6 +41,10 @@ export const DET_PARAMS = {
   // (brief occlusion, motion blur) are tolerated before dropping an existing lock.
   stableFrames: Math.max(1, Math.round(numParam('stableFrames', 4))),
   missGrace: Math.max(0, Math.round(numParam('missGrace', 6))),
+  // CLAHE (local contrast enhancement) before blur+Canny — helps a lot in dim rooms
+  // where the raw image is technically fine but low-contrast. On by default; ?clahe=0
+  // disables it for comparison.
+  clahe: boolParam('clahe', true),
 };
 if (urlParams.has('debug')) buildDebugPanel();
 
@@ -74,6 +78,18 @@ function buildDebugPanel() {
   // Refreshed from detectQuad() each frame autoCanny actually ran, so you can see
   // what thresholds it's choosing without opening devtools.
   lastAutoCannyReadoutEl = autoCannyReadout;
+
+  const claheRow = document.createElement('label');
+  claheRow.style.cssText = 'display:flex;gap:6px;align-items:center;margin-bottom:4px;';
+  const claheCheckbox = document.createElement('input');
+  claheCheckbox.type = 'checkbox';
+  claheCheckbox.checked = DET_PARAMS.clahe;
+  const claheLabel = document.createElement('span');
+  claheLabel.textContent = 'clahe (realce de contraste local)';
+  claheCheckbox.addEventListener('change', () => { DET_PARAMS.clahe = claheCheckbox.checked; });
+  claheRow.appendChild(claheCheckbox);
+  claheRow.appendChild(claheLabel);
+  panel.appendChild(claheRow);
 
   const fields = [
     ['minAreaRatio', 0.02, 0.5, 0.01],
@@ -226,19 +242,54 @@ function findBestQuadPoints(blurred, cannyLow, cannyHigh) {
   }
 }
 
+// Below this raw (pre-CLAHE) median, the scene itself is dim enough that the user
+// gets a "poca luz" hint instead of the generic "apunta a un documento" one — CLAHE
+// and auto-Canny can stretch contrast, but neither adds light that was never
+// captured, so a very dark frame still deserves an honest, actionable message.
+const LOW_LIGHT_MEDIAN_THRESHOLD = 60;
+
+function updateLowLightHint(rawMedian) {
+  if (state.lastQuad) return; // don't override "mantén el encuadre" while locked
+  hintText.textContent = rawMedian < LOW_LIGHT_MEDIAN_THRESHOLD
+    ? 'Poca luz — acércate a una fuente de luz o activa el flash.'
+    : 'Apunta a un documento sobre una superficie con contraste.';
+}
+
+// CLAHE (contrast-limited adaptive histogram equalization) boosts local contrast
+// tile-by-tile instead of stretching the whole frame's histogram at once — the
+// classic fix for "the document is there but too low-contrast to see" in dim
+// rooms, without blowing out noise the way a flat global equalizeHist would in
+// the same conditions. cv.CLAHE is a real constructor in OpenCV.js (confirmed
+// against the actual WASM build, not just the Python API docs).
+function applyClahe(gray, dst) {
+  const clahe = new cv.CLAHE(3.0, new cv.Size(8, 8));
+  try {
+    clahe.apply(gray, dst);
+  } finally {
+    clahe.delete();
+  }
+}
+
 // Draw current cropped video frame into a small canvas, then run the
 // edge-detect + contour pipeline to find the best 4-point candidate.
 function detectQuad() {
   const c = video._crop;
   detCtx.drawImage(video, c.sx, c.sy, c.sw, c.sh, 0, 0, detCanvas.width, detCanvas.height);
 
-  let src, gray, blurred;
+  let src, gray, enhanced, blurred;
   try {
     src = cv.imread(detCanvas);
     gray = new cv.Mat();
     cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+    updateLowLightHint(estimateMedian(gray));
+
+    enhanced = gray;
+    if (DET_PARAMS.clahe) {
+      enhanced = new cv.Mat();
+      applyClahe(gray, enhanced);
+    }
     blurred = new cv.Mat();
-    cv.GaussianBlur(gray, blurred, new cv.Size(DET_PARAMS.blur, DET_PARAMS.blur), 0);
+    cv.GaussianBlur(enhanced, blurred, new cv.Size(DET_PARAMS.blur, DET_PARAMS.blur), 0);
 
     let cannyLow = DET_PARAMS.cannyLow, cannyHigh = DET_PARAMS.cannyHigh;
     if (DET_PARAMS.autoCanny) {
@@ -265,6 +316,9 @@ function detectQuad() {
   } catch (e) {
     // Skip a frame silently if OpenCV throws (e.g. transient buffer state).
   } finally {
+    // `enhanced` is only a distinct Mat (needing its own delete) when CLAHE ran —
+    // otherwise it's just an alias for `gray`, already covered below.
+    if (enhanced && enhanced !== gray) enhanced.delete();
     [src, gray, blurred].forEach(m => m && m.delete && m.delete());
   }
 
@@ -364,8 +418,11 @@ export function setLocked(locked) {
     statusPill.textContent = 'buscando';
     statusPill.className = 'searching';
     stageLive.classList.add('searching');
-    hintText.textContent = 'Apunta a un documento sobre una superficie con contraste.';
     shutterBtn.classList.remove('ready');
+    // hintText for the "not locked" case is driven every frame by updateLowLightHint()
+    // instead of set here — low light can persist for a long time with no lock
+    // transition happening again, so it can't just be a one-off message on this
+    // transition the way the "locked" branch above is.
   }
 }
 

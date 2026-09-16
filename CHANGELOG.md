@@ -5,6 +5,25 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-16
+
+### Added
+
+- CLAHE (realce de contraste local adaptativo) antes de blur+Canny, activado por
+  defecto (`?clahe=0` para desactivarlo) — mejora bastante la detección en
+  habitaciones con poca luz donde el documento tiene poco contraste pero la
+  escena en sí no es imposible de procesar. Verificado contra el build real de
+  OpenCV.js: `cv.CLAHE` existe como constructor y `.apply()` funciona como se
+  espera.
+- Aviso de "poca luz" en el texto de ayuda cuando la mediana de brillo del frame
+  (antes de CLAHE, para reflejar la luz ambiente real) cae por debajo de un
+  umbral — honesto sobre el límite físico: ningún procesado añade luz que la
+  cámara nunca captó.
+- Botón de linterna (flash trasero como luz continua) sobre la vista de cámara,
+  visible solo cuando el navegador/dispositivo confirma soportarlo
+  (`track.getCapabilities().torch`) — la mayoría de cámaras frontales y Safari
+  en iOS no lo soportan, así que el botón se oculta en vez de fallar en silencio.
+
 ## [0.6.0] - 2026-09-16
 
 ### Added
@@ -151,7 +170,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/rzazo24/zscanner/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/rzazo24/zscanner/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/rzazo24/zscanner/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/rzazo24/zscanner/compare/v0.5.0...v0.5.1

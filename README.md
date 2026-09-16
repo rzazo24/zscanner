@@ -1,6 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
-![Version](https://img.shields.io/badge/version-0.6.0-3ef27a?style=flat)
+![Version](https://img.shields.io/badge/version-0.7.0-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -39,6 +39,14 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
   marcarlo como "detectado" (evita que el estado parpadee con ruido puntual), y tolera
   unos cuantos frames sin detección antes de soltar el bloqueo (una mano cruzando el
   encuadre, un poco de desenfoque de movimiento) en vez de perderlo al instante.
+- Antes de buscar bordes, cada frame pasa por CLAHE (realce de contraste local por
+  zonas) — ayuda mucho en habitaciones con poca luz, donde el documento está ahí pero
+  con muy poco contraste, sin amplificar el ruido tanto como una ecualización global.
+  Además, un aviso avisa cuando la escena en sí es demasiado oscura para que cualquier
+  procesado la arregle ("Poca luz — acércate a una fuente de luz o activa el flash").
+- Si el dispositivo tiene flash trasero, aparece un botón de linterna sobre la cámara
+  para usarlo como luz continua mientras se escanea (no todos los navegadores/cámaras
+  lo soportan — en ese caso el botón no aparece).
 - Con el documento detectado, el disparador captura directamente: recorta con
   `getPerspectiveTransform` + `warpPerspective` usando las 4 esquinas encontradas,
   escaladas a resolución completa.
@@ -77,8 +85,10 @@ con el valor aplicándose en vivo al siguiente frame.
   fetch fallido de uno correcto), así que la primera carga en cada dispositivo depende de
   la conexión. Se apoya en la caché HTTP normal del navegador (24h) para las recargas
   siguientes.
-- La detección depende de contraste entre el documento y la superficie — fondos muy
-  claros o con poca luz pueden requerir el ajuste manual de esquinas.
+- La detección depende de contraste entre el documento y la superficie. CLAHE ayuda
+  bastante cuando el problema es *poco contraste con luz suficiente*, pero no hay
+  procesado que invente luz que la cámara nunca capturó — con muy poca luz real, sigue
+  haciendo falta el flash (si el dispositivo lo soporta) o el ajuste manual de esquinas.
 - Procesa un documento a la vez; no hay modo de captura por lotes ni PDF multipágina.
 
 ## Posibles mejoras futuras

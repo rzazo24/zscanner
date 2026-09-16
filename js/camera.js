@@ -42,3 +42,24 @@ export function sizeCanvases() {
   video._crop = { sx, sy, sw, sh };
   resizeDetectionCanvas(stageAspect);
 }
+
+// Torch (rear camera flash used as a continuous light, not a photo flash) is exposed
+// as a track constraint, not a MediaStream API of its own — support is inconsistent
+// (most Android/Chrome rear cameras have it, iOS Safari and front cameras generally
+// don't), so callers must feature-detect via getTorchSupport() before showing any UI
+// for it rather than assuming it exists.
+export function getTorchSupport() {
+  const track = state.currentStream?.getVideoTracks()[0];
+  return Boolean(track?.getCapabilities?.().torch);
+}
+
+export async function setTorch(enabled) {
+  const track = state.currentStream?.getVideoTracks()[0];
+  if (!track) return false;
+  try {
+    await track.applyConstraints({ advanced: [{ torch: enabled }] });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}

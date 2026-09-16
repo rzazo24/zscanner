@@ -6,6 +6,7 @@ import { video, adjustCanvas, adjustOverlay, adjustMagnifier } from './dom.js';
 import { state } from './state.js';
 import { detCanvas } from './detection.js';
 import { showAdjustStage } from './ui.js';
+import { grabHighResPhoto } from './camera.js';
 
 // ~300dpi for a full A4/letter page — the standard reasonable target for a document
 // scan meant to be read or OCR'd. Capped rather than uncapped: using the camera's raw
@@ -13,18 +14,42 @@ import { showAdjustStage } from './ui.js';
 // warpPerspective + output canvas on higher-end cameras for no visible benefit.
 const MAX_SHOT_WIDTH = 2400;
 
-// Grab a full-resolution frame from the cropped (cover-mapped) video region, at the
-// camera's own native resolution (up to MAX_SHOT_WIDTH) rather than a fixed size —
-// on a device whose camera can't reach that anyway, this just uses what's actually
-// available instead of pointlessly upscaling past the real source resolution.
-export function grabFullFrame() {
-  const c = video._crop;
-  const fullW = Math.min(MAX_SHOT_WIDTH, Math.round(c.sw));
-  const fullH = Math.round(fullW * (c.sh / c.sw));
+function drawCroppedShot(source, sx, sy, sw, sh) {
+  const fullW = Math.min(MAX_SHOT_WIDTH, Math.round(sw));
+  const fullH = Math.round(fullW * (sh / sw));
   const shot = document.createElement('canvas');
   shot.width = fullW; shot.height = fullH;
-  shot.getContext('2d').drawImage(video, c.sx, c.sy, c.sw, c.sh, 0, 0, fullW, fullH);
+  shot.getContext('2d').drawImage(source, sx, sy, sw, sh, 0, 0, fullW, fullH);
   return shot;
+}
+
+// Grab a full-resolution frame of whatever the camera is currently pointed at, at the
+// camera's own native resolution (up to MAX_SHOT_WIDTH) rather than a fixed size — on
+// a device whose camera can't reach that anyway, this just uses what's actually
+// available instead of pointlessly upscaling past the real source resolution.
+//
+// Tries a genuine full-resolution still photo first (ImageCapture.takePhoto(), see
+// camera.js) since the live video stream's own resolution is well below what most
+// camera sensors can actually produce for a single shot — confirmed directly: a
+// stream negotiated at 2400x2160 still yielded a 3840x2160 takePhoto() result on the
+// same track. Falls back to a plain snapshot of the current video frame when that API
+// isn't available (Safari) or fails/times out on a particular device.
+export async function grabFullFrame() {
+  const c = video._crop;
+  const photo = await grabHighResPhoto();
+  if (photo) {
+    // The still photo can be a different resolution than the live video stream (that's
+    // the whole point), so video._crop — computed against video.videoWidth/Height —
+    // has to be rescaled proportionally rather than reused as-is. This assumes the
+    // photo and video modes share the same field of view and just differ in
+    // resolution, which holds for the vast majority of phone cameras.
+    const scaleX = photo.width / video.videoWidth;
+    const scaleY = photo.height / video.videoHeight;
+    const shot = drawCroppedShot(photo, c.sx * scaleX, c.sy * scaleY, c.sw * scaleX, c.sh * scaleY);
+    photo.close();
+    return shot;
+  }
+  return drawCroppedShot(video, c.sx, c.sy, c.sw, c.sh);
 }
 
 // Scales the live-detected quad (in small detCanvas coordinates) up to a

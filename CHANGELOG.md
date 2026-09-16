@@ -5,6 +5,25 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-09-16
+
+### Added
+
+- Captura a resolución completa con la API `ImageCapture` (`takePhoto()`) en vez
+  de solo tomar el frame actual del vídeo en directo. El stream de vídeo continuo
+  de `getUserMedia` está limitado muy por debajo de la resolución de foto real de
+  la cámara (necesita seguir decodificando frames en tiempo real) — confirmado
+  directamente: un stream negociado a 2400×2160 dio una foto de 3840×2160 con
+  `takePhoto()` sobre el mismo track, en el mismo dispositivo. Cae
+  automáticamente al frame de vídeo de siempre cuando la API no existe (Safari
+  no la soporta) o falla/tarda más de 4s en un dispositivo concreto.
+
+### Changed
+
+- `grabFullFrame()` pasa a ser asíncrona (para poder esperar `takePhoto()`);
+  actualizados los tres puntos de llamada (disparador, ajuste manual,
+  `captureDetected()`).
+
 ## [0.11.0] - 2026-09-16
 
 ### Added
@@ -257,7 +276,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/rzazo24/zscanner/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/rzazo24/zscanner/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/rzazo24/zscanner/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/rzazo24/zscanner/compare/v0.9.0...v0.9.1

@@ -1,6 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
-![Version](https://img.shields.io/badge/version-0.11.0-3ef27a?style=flat)
+![Version](https://img.shields.io/badge/version-0.12.0-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -51,9 +51,14 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
   procesado la arregle ("Poca luz — busca una zona con más luz ambiente").
 - La cámara se pide a ~2400×3200 (antes 1280×1706) — la detección en vivo no se entera,
   porque corre sobre una copia reducida a 360px, así que la resolución de captura no
-  afecta a la velocidad del escaneo en vivo, solo a la calidad del resultado final. Con
-  el documento detectado, el disparador captura directamente a la resolución nativa de
-  la cámara (topada en ~2400px de ancho, equivalente a un A4 a 300dpi): recorta con
+  afecta a la velocidad del escaneo en vivo, solo a la calidad del resultado final.
+- Al capturar, se pide una foto a resolución completa con la API `ImageCapture`
+  (`takePhoto()`) en vez de solo tomar el frame actual del vídeo en directo — el stream
+  de vídeo continuo de `getUserMedia` está limitado muy por debajo de lo que la cámara
+  puede dar en una foto suelta (confirmado: un stream negociado a 2400×2160 dio una foto
+  de 3840×2160 en el mismo dispositivo). Si el navegador no soporta esta API (Safari) o
+  falla, cae automáticamente al frame de vídeo de siempre. El recorte final sigue topado
+  en ~2400px de ancho (equivalente a un A4 a 300dpi): recorta con
   `getPerspectiveTransform` + `warpPerspective` usando las 4 esquinas encontradas.
 - Si la detección automática falla, o si el resultado no queda bien encuadrado, hay una
   red de seguridad: el botón de encuadre manual (o "Ajustar" ya en el resultado) congela
@@ -111,6 +116,10 @@ con el valor aplicándose en vivo al siguiente frame.
   con caída brusca hacia los bordes en vez de luz uniforme, lo que en la práctica
   empeora la detección (bordes falsos alrededor del propio brillo) en vez de mejorarla
   — se probó y se revirtió, ver [CHANGELOG](CHANGELOG.md).
+- La captura a resolución completa vía `ImageCapture.takePhoto()` no está disponible en
+  Safari (iOS/macOS) ni en cámaras frontales de algunos dispositivos — en esos casos cae
+  automáticamente al frame de vídeo en directo, con la resolución del stream de cámara
+  en vez de la de foto completa.
 - Procesa un documento a la vez; no hay modo de captura por lotes ni PDF multipágina.
 
 ## Posibles mejoras futuras

@@ -13,18 +13,44 @@ import { showAdjustStage } from './ui.js';
 // warpPerspective + output canvas on higher-end cameras for no visible benefit.
 const MAX_SHOT_WIDTH = 2400;
 
+function drawCroppedShot(source, sx, sy, sw, sh) {
+  const fullW = Math.min(MAX_SHOT_WIDTH, Math.round(sw));
+  const fullH = Math.round(fullW * (sh / sw));
+  const shot = document.createElement('canvas');
+  shot.width = fullW; shot.height = fullH;
+  shot.getContext('2d').drawImage(source, sx, sy, sw, sh, 0, 0, fullW, fullH);
+  return shot;
+}
+
 // Grab a full-resolution frame from the cropped (cover-mapped) video region, at the
 // camera's own native resolution (up to MAX_SHOT_WIDTH) rather than a fixed size —
 // on a device whose camera can't reach that anyway, this just uses what's actually
 // available instead of pointlessly upscaling past the real source resolution.
 export function grabFullFrame() {
   const c = video._crop;
-  const fullW = Math.min(MAX_SHOT_WIDTH, Math.round(c.sw));
-  const fullH = Math.round(fullW * (c.sh / c.sw));
-  const shot = document.createElement('canvas');
-  shot.width = fullW; shot.height = fullH;
-  shot.getContext('2d').drawImage(video, c.sx, c.sy, c.sw, c.sh, 0, 0, fullW, fullH);
-  return shot;
+  return drawCroppedShot(video, c.sx, c.sy, c.sw, c.sh);
+}
+
+// Loads a user-picked image file (gallery/"choose file") into a shot canvas, same
+// shape as grabFullFrame()'s output — a completely independent path from the live
+// camera/getUserMedia/ImageCapture, so it keeps working even if something about the
+// live camera pipeline on a given device doesn't (see CLAUDE.md's iOS notes). No
+// auto-detected quad exists for a picked photo, so this always lands in the manual-
+// adjust stage rather than attempting the auto-capture fast path.
+export function loadImageFile(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const shot = drawCroppedShot(img, 0, 0, img.naturalWidth, img.naturalHeight);
+      URL.revokeObjectURL(img.src);
+      resolve(shot);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(img.src);
+      reject(new Error('No se pudo cargar la imagen'));
+    };
+    img.src = URL.createObjectURL(file);
+  });
 }
 
 // Scales the live-detected quad (in small detCanvas coordinates) up to a

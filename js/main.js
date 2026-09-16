@@ -3,7 +3,8 @@
 // across the other modules.
 
 import {
-  switchCamBtn, shutterBtn, manualBtn, retakeBtn, adjustAgainBtn,
+  switchCamBtn, shutterBtn, manualBtn, galleryBtn, galleryInput,
+  retakeBtn, adjustAgainBtn,
   adjustCancelBtn, adjustConfirmBtn, video, loadingOverlay, loadingText,
   cameraPriming, cameraPrimingBtn, cameraPrimingError,
   statusPill, stageLive, resultPanel, updateBanner, updateReloadBtn,
@@ -12,7 +13,7 @@ import { state } from './state.js';
 import { showLiveStage, backToResultFromAdjust } from './ui.js';
 import { runDetectionLoop, setLocked } from './detection.js';
 import { openStream, sizeCanvases } from './camera.js';
-import { grabFullFrame, bestGuessQuad, enterAdjustMode } from './adjust.js';
+import { grabFullFrame, bestGuessQuad, enterAdjustMode, loadImageFile } from './adjust.js';
 import { captureDetected, finalizeWarp } from './perspective.js';
 
 function onOpenCvReady() {
@@ -100,6 +101,24 @@ shutterBtn.addEventListener('click', () => {
 manualBtn.addEventListener('click', () => {
   const shot = grabFullFrame();
   enterAdjustMode(shot, bestGuessQuad(shot), 'live');
+});
+
+galleryBtn.addEventListener('click', () => galleryInput.click());
+
+galleryInput.addEventListener('change', async () => {
+  const file = galleryInput.files[0];
+  galleryInput.value = ''; // reset so picking the exact same file again still fires 'change'
+  if (!file) return;
+  try {
+    const shot = await loadImageFile(file);
+    // No auto-detected quad exists for a picked photo (it never went through the
+    // live detection loop), so this always lands in manual-adjust, not the
+    // auto-capture fast path.
+    enterAdjustMode(shot, null, 'live');
+  } catch (e) {
+    // Corrupt/unsupported file — rare enough to just stay on the live view silently
+    // rather than needing a dedicated error-toast mechanism for this one case.
+  }
 });
 
 adjustAgainBtn.addEventListener('click', () => {

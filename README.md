@@ -1,6 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
-![Version](https://img.shields.io/badge/version-0.12.2-3ef27a?style=flat)
+![Version](https://img.shields.io/badge/version-0.13.0-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -63,6 +63,13 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
   rectángulo genérico centrado. Al arrastrar una esquina aparece una lupa con mira,
   desplazada para no quedar tapada por el dedo — el problema número uno de cualquier
   interfaz de recorte táctil.
+- También se puede elegir una foto ya existente de la galería en vez de usar la cámara
+  en vivo — un botón junto al disparador abre el selector de archivos nativo
+  (`<input type="file">`). Al no depender de `getUserMedia` ni del bucle de detección,
+  es una vía de escaneo completamente independiente de la cámara en vivo: sigue
+  funcionando igual aunque haya algún problema puntual con esta última. La imagen
+  elegida siempre pasa por el ajuste manual de esquinas (no hay detección automática
+  posible sobre una foto ya tomada).
 - El resultado se puede ver en cuatro modos, y descargarse como PNG:
   - **Mejorado** (por defecto): aplana la iluminación desigual y sube el contraste sin
     binarizar — el mismo tipo de filtro que el "B&N" de CamScanner, que en realidad no

@@ -5,6 +5,19 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-09-16
+
+### Added
+
+- Opción para elegir una foto de la galería en vez de usar la cámara en vivo, vía
+  un `<input type="file">` estándar. Es una vía de escaneo completamente
+  independiente de `getUserMedia`/el bucle de detección/`ImageCapture` — sigue
+  funcionando igual aunque haya algún problema con la cámara en vivo en un
+  dispositivo concreto (ver las notas de iOS sin resolver en versiones
+  anteriores). La foto elegida siempre entra en el ajuste manual de esquinas,
+  ya que no existe ninguna detección automática previa sobre una imagen que no
+  pasó por la cámara en directo.
+
 ## [0.12.2] - 2026-09-16
 
 ### Reverted
@@ -275,7 +288,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.12.2...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/rzazo24/zscanner/compare/v0.12.2...v0.13.0
 [0.12.2]: https://github.com/rzazo24/zscanner/compare/v0.11.0...v0.12.2
 [0.11.0]: https://github.com/rzazo24/zscanner/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/rzazo24/zscanner/compare/v0.9.1...v0.10.0

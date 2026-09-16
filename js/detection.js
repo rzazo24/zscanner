@@ -25,7 +25,7 @@ function boolParam(name, fallback) {
 // Set by buildDebugPanel() below (only reachable when ?debug=1); stays null otherwise.
 let lastAutoCannyReadoutEl = null;
 export const DET_PARAMS = {
-  minAreaRatio: numParam('minArea', 0.15),
+  minAreaRatio: numParam('minArea', 0.10),
   // Only used as a fallback / manual override — see autoCanny below.
   cannyLow: numParam('cannyLow', 50),
   cannyHigh: numParam('cannyHigh', 150),
@@ -151,27 +151,41 @@ function autoCannyThresholds(grayMat) {
   };
 }
 
-// Draw current cropped video frame into a small canvas, then run the
-// edge-detect + contour pipeline to find the best 4-point candidate.
-function detectQuad() {
-  const c = video._crop;
-  detCtx.drawImage(video, c.sx, c.sy, c.sw, c.sh, 0, 0, detCanvas.width, detCanvas.height);
+// A real document, even viewed at a noticeable angle, doesn't produce interior
+// corner angles anywhere near 0° or 180° — only a degenerate/sliver-shaped
+// contour does. Generous on purpose (not "close to 90°") so a page held at a
+// steep angle is never rejected just for looking skewed in 2D projection; this
+// is only meant to catch clearly-not-rectangular junk.
+const MIN_CORNER_ANGLE_DEG = 30;
+const MAX_CORNER_ANGLE_DEG = 150;
 
-  let src, gray, blurred, edges, dilated, kernel, contours, hierarchy, best = null;
+function angleAtVertex(prev, curr, next) {
+  const v1x = prev.x - curr.x, v1y = prev.y - curr.y;
+  const v2x = next.x - curr.x, v2y = next.y - curr.y;
+  const mag1 = Math.hypot(v1x, v1y), mag2 = Math.hypot(v2x, v2y);
+  if (mag1 === 0 || mag2 === 0) return 0;
+  const cos = Math.max(-1, Math.min(1, (v1x * v2x + v1y * v2y) / (mag1 * mag2)));
+  return Math.acos(cos) * 180 / Math.PI;
+}
+
+function isReasonableQuad(pts) {
+  for (let i = 0; i < 4; i++) {
+    const angle = angleAtVertex(pts[(i + 3) % 4], pts[i], pts[(i + 1) % 4]);
+    if (angle < MIN_CORNER_ANGLE_DEG || angle > MAX_CORNER_ANGLE_DEG) return false;
+  }
+  return true;
+}
+
+// Runs edge-detect -> dilate -> findContours -> approxPolyDP for one Canny
+// threshold pair and returns the best matching quad's 4 points (contour order,
+// not yet tl/tr/br/bl-sorted), or null if none found. Manages its own Mats
+// entirely and deletes all of them before returning either way, so callers can
+// call this more than once per frame (e.g. a retry with different thresholds)
+// without having to track Mat lifetimes across calls.
+function findBestQuadPoints(blurred, cannyLow, cannyHigh) {
+  let edges, dilated, kernel, contours, hierarchy;
   try {
-    src = cv.imread(detCanvas);
-    gray = new cv.Mat();
-    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-    blurred = new cv.Mat();
-    cv.GaussianBlur(gray, blurred, new cv.Size(DET_PARAMS.blur, DET_PARAMS.blur), 0);
     edges = new cv.Mat();
-    let cannyLow = DET_PARAMS.cannyLow, cannyHigh = DET_PARAMS.cannyHigh;
-    if (DET_PARAMS.autoCanny) {
-      const auto = autoCannyThresholds(blurred);
-      cannyLow = auto.low;
-      cannyHigh = auto.high;
-      if (lastAutoCannyReadoutEl) lastAutoCannyReadoutEl.textContent = `low=${auto.low.toFixed(0)} high=${auto.high.toFixed(0)}`;
-    }
     cv.Canny(blurred, edges, cannyLow, cannyHigh);
     dilated = new cv.Mat();
     kernel = cv.Mat.ones(3, 3, cv.CV_8U);
@@ -183,6 +197,7 @@ function detectQuad() {
 
     const imgArea = detCanvas.width * detCanvas.height;
     let bestArea = 0;
+    let best = null;
 
     for (let i = 0; i < contours.size(); i++) {
       const cnt = contours.get(i);
@@ -192,31 +207,65 @@ function detectQuad() {
         const approx = new cv.Mat();
         cv.approxPolyDP(cnt, approx, DET_PARAMS.approxEpsilon * peri, true);
         if (approx.rows === 4 && cv.isContourConvex(approx)) {
-          bestArea = area;
-          if (best) best.delete();
-          best = approx;
-        } else {
-          approx.delete();
+          const pts = [];
+          for (let j = 0; j < 4; j++) {
+            pts.push({ x: approx.intPtr(j, 0)[0], y: approx.intPtr(j, 0)[1] });
+          }
+          if (isReasonableQuad(pts)) {
+            bestArea = area;
+            best = pts;
+          }
         }
+        approx.delete();
       }
       cnt.delete();
     }
+    return best;
+  } finally {
+    [edges, dilated, kernel, contours, hierarchy].forEach(m => m && m.delete && m.delete());
+  }
+}
 
-    let rawQuad = null;
-    if (best) {
-      const pts = [];
-      for (let i = 0; i < 4; i++) {
-        pts.push({ x: best.intPtr(i, 0)[0], y: best.intPtr(i, 0)[1] });
-      }
-      rawQuad = orderPoints(pts);
+// Draw current cropped video frame into a small canvas, then run the
+// edge-detect + contour pipeline to find the best 4-point candidate.
+function detectQuad() {
+  const c = video._crop;
+  detCtx.drawImage(video, c.sx, c.sy, c.sw, c.sh, 0, 0, detCanvas.width, detCanvas.height);
+
+  let src, gray, blurred;
+  try {
+    src = cv.imread(detCanvas);
+    gray = new cv.Mat();
+    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+    blurred = new cv.Mat();
+    cv.GaussianBlur(gray, blurred, new cv.Size(DET_PARAMS.blur, DET_PARAMS.blur), 0);
+
+    let cannyLow = DET_PARAMS.cannyLow, cannyHigh = DET_PARAMS.cannyHigh;
+    if (DET_PARAMS.autoCanny) {
+      const auto = autoCannyThresholds(blurred);
+      cannyLow = auto.low;
+      cannyHigh = auto.high;
+      if (lastAutoCannyReadoutEl) lastAutoCannyReadoutEl.textContent = `low=${auto.low.toFixed(0)} high=${auto.high.toFixed(0)}`;
     }
+
+    let pts = findBestQuadPoints(blurred, cannyLow, cannyHigh);
+    if (!pts && DET_PARAMS.autoCanny) {
+      // The primary estimate found no clean quad at all — retry once with a wider,
+      // more permissive band before giving up on this frame. One extra Canny +
+      // contours pass is cheap, and this meaningfully helps marginal-contrast
+      // scenes where the median-based estimate was too strict to close the
+      // document's contour into a single 4-point shape. Skipped when Canny is
+      // pinned to explicit fixed values — that's a deliberate override, not
+      // something to second-guess with a different pair.
+      pts = findBestQuadPoints(blurred, cannyLow * 0.5, Math.min(255, cannyHigh * 1.2));
+    }
+
+    const rawQuad = pts ? orderPoints(pts) : null;
     handleDetectionResult(rawQuad, Math.hypot(detCanvas.width, detCanvas.height));
   } catch (e) {
     // Skip a frame silently if OpenCV throws (e.g. transient buffer state).
   } finally {
-    // `best` is deleted here (rather than right after reading its points above)
-    // so it's also cleaned up if an exception is thrown before that point.
-    [src, gray, blurred, edges, dilated, kernel, contours, hierarchy, best].forEach(m => m && m.delete && m.delete());
+    [src, gray, blurred].forEach(m => m && m.delete && m.delete());
   }
 
   drawOverlay();

@@ -1,6 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
-![Version](https://img.shields.io/badge/version-0.5.2-3ef27a?style=flat)
+![Version](https://img.shields.io/badge/version-0.6.0-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -29,7 +29,12 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
 - Los umbrales de `Canny` se recalculan en cada frame a partir de la mediana de brillo de
   la imagen (heurística estándar, sigma=0.33), en vez de usar un par de valores fijos —
   así la detección se adapta sola a luz mala o poco contraste en vez de depender de un
-  ajuste manual único que solo funciona bien en una escena.
+  ajuste manual único que solo funciona bien en una escena. Si ese cálculo no encuentra
+  ningún cuadrilátero, se reintenta una vez con umbrales más permisivos antes de rendirse
+  en ese frame.
+- Solo se aceptan cuadriláteros con los 4 ángulos internos razonablemente rectos (con
+  margen amplio para tolerar perspectiva pronunciada) — descarta formas degeneradas que
+  antes podían "engancharse" a objetos que no son el documento.
 - La detección exige varios frames consecutivos con un cuadrilátero similar antes de
   marcarlo como "detectado" (evita que el estado parpadee con ruido puntual), y tolera
   unos cuantos frames sin detección antes de soltar el bloqueo (una mano cruzando el

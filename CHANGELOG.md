@@ -5,6 +5,31 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-16
+
+### Added
+
+- Filtro de rectangularidad: un cuadrilátero candidato solo se acepta si sus 4
+  ángulos internos están dentro de un margen amplio (30°-150°, generoso a
+  propósito para no rechazar documentos vistos con perspectiva pronunciada) —
+  descarta formas degeneradas/con picos que antes podían aceptarse como
+  documento válido solo por tener área grande y 4 vértices.
+- Reintento con umbrales más permisivos: si el Canny adaptativo no encuentra
+  ningún cuadrilátero válido en un frame, se reintenta una vez con un umbral
+  más ancho antes de rendirse — ayuda en escenas de contraste marginal donde
+  la estimación por mediana fue demasiado estricta para cerrar el contorno.
+- Área mínima por defecto más permisiva (`minArea`: 0.15 → 0.10), para
+  documentos capturados desde algo más lejos.
+
+### Changed
+
+- Refactor interno de `detection.js`: el pipeline Canny→contornos→approxPolyDP
+  se extrae a una función reutilizable (`findBestQuadPoints`) que gestiona sus
+  propios `cv.Mat` de principio a fin, en vez de mantener uno vivo entre
+  iteraciones del bucle — permite reintentar con otro umbral dentro del mismo
+  frame sin duplicar la gestión de memoria, y simplifica el ciclo de vida de
+  los `Mat` en general.
+
 ## [0.5.2] - 2026-09-16
 
 ### Fixed
@@ -126,7 +151,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.5.2...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/rzazo24/zscanner/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/rzazo24/zscanner/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/rzazo24/zscanner/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/rzazo24/zscanner/compare/v0.4.0...v0.5.0

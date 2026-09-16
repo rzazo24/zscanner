@@ -80,29 +80,42 @@ function loadJsPdf() {
   return jsPdfLoadPromise;
 }
 
-// Each page becomes its own PDF page sized to match that page's own pixel dimensions
-// (unit: 'px') rather than forcing every page onto a fixed A4/letter size — captures
-// can have different crop aspect ratios, and this avoids letterboxing or stretching
-// any of them. Confirmed directly against the real jsPDF build (not assumed from
-// docs) that unit:'px' + a [w, h] format produces a page matching those exact pixel
-// dimensions, and that per-page addPage([w, h], orientation) works the same way for
-// pages after the first.
+// All pages share a single page size (unit: 'px'), taken from the first capture, so
+// the PDF looks like one consistent document instead of jumping between sizes as you
+// scroll through it. Previously each page was sized to its own pixel dimensions —
+// avoided A4-stretching, but a hand-held crop is never pixel-identical between shots
+// even of the same physical page, so a multi-page scan of one real document came out
+// visibly "unequal" (v0.14.4 fix). Each page's image is scaled to *fit* the shared
+// size (never stretched, aspect ratio preserved) and centered, with the small
+// leftover margin filled white — these are photos of paper, so a white margin blends
+// in rather than showing as a visible border. Confirmed directly against the real
+// jsPDF build that unit:'px' + a [w, h] format produces a page matching those exact
+// pixel dimensions, and that per-page addPage([w, h], orientation) works the same way
+// for pages after the first.
 export async function exportPagesAsPdf() {
   if (state.pages.length === 0) return;
   await loadJsPdf();
   const { jsPDF } = window.jspdf;
 
   const first = state.pages[0];
-  const doc = new jsPDF({ unit: 'px', format: [first.width, first.height] });
+  const pageW = first.width, pageH = first.height;
+  const doc = new jsPDF({ unit: 'px', format: [pageW, pageH] });
 
   state.pages.forEach((canvas, i) => {
     if (i > 0) {
-      doc.addPage([canvas.width, canvas.height], canvas.width > canvas.height ? 'landscape' : 'portrait');
+      doc.addPage([pageW, pageH], pageW > pageH ? 'landscape' : 'portrait');
     }
+    const scale = Math.min(pageW / canvas.width, pageH / canvas.height);
+    const drawW = canvas.width * scale;
+    const drawH = canvas.height * scale;
+    const offsetX = (pageW - drawW) / 2;
+    const offsetY = (pageH - drawH) / 2;
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, pageW, pageH, 'F');
     // JPEG, not PNG: these are photos of paper, not graphics with sharp flat colors —
     // JPEG's lossy compression is far smaller here for barely perceptible quality
     // loss, which matters once several full-resolution pages are bundled into one file.
-    doc.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, canvas.width, canvas.height);
+    doc.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', offsetX, offsetY, drawW, drawH);
   });
 
   doc.save('documento-escaneado.pdf');

@@ -5,6 +5,22 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.14.4] - 2026-09-16
+
+### Fixed
+
+- Las páginas del PDF multipágina salían "desiguales": cada una se dimensionaba a
+  sus propios píxeles exactos en vez de compartir un tamaño común, así que un
+  recorte ligeramente distinto entre una foto y otra (normal incluso escaneando
+  el mismo documento físico a mano) hacía que cada página tuviera una proporción
+  distinta y el PDF cambiara de tamaño/zoom al pasar de una página a otra. Ahora
+  todas las páginas comparten el tamaño de la primera captura; el resto se
+  encajan dentro de ese tamaño (sin recortar ni estirar, solo escaladas y
+  centradas, con un margen blanco si la proporción no coincide exactamente).
+  Verificado con Playwright generando un PDF con tres páginas de proporciones
+  distintas a propósito: las tres comparten el mismo `/MediaBox` en el PDF
+  resultante.
+
 ## [0.14.3] - 2026-09-16
 
 ### Fixed

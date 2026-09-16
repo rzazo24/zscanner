@@ -1,6 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
-![Version](https://img.shields.io/badge/version-0.14.3-3ef27a?style=flat)
+![Version](https://img.shields.io/badge/version-0.14.4-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -89,8 +89,10 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
   resultado la guarda (en el modo de salida que tuviera en ese momento) y vuelve a la
   cámara para la siguiente, con una barra de miniaturas (quitar una página con su ×)
   visible en cualquier pantalla mientras la sesión siga activa. "Finalizar PDF" junta
-  todas las páginas guardadas en un único PDF, cada página a su propio tamaño (no fuerza
-  un A4 si el recorte tuvo otra proporción) — usando [jsPDF](https://github.com/parallax/jsPDF)
+  todas las páginas guardadas en un único PDF — todas comparten el tamaño de la primera
+  página (el resto se encajan sin recortar ni estirar, solo escaladas y centradas) para
+  que el documento se vea consistente en vez de cambiar de tamaño entre página y página
+  por pequeñas diferencias de recorte — usando [jsPDF](https://github.com/parallax/jsPDF)
   cargado por CDN solo la primera vez que hace falta, no en cada visita.
 - Es una PWA instalable en el móvil (icono en pantalla de inicio, pantalla completa sin
   barra del navegador). Un service worker (`sw.js`) cachea el shell estático de la app

@@ -134,10 +134,19 @@ export function resizeDetectionCanvas(stageAspect) {
   detCanvas.height = Math.round(DET_W / stageAspect);
 }
 
+// detectQuad() runs CLAHE+Canny+contours per call; letting requestAnimationFrame
+// drive it at the display's own refresh rate (up to 120Hz on ProMotion iPhones)
+// pegs the CPU/GPU continuously with no benefit — the quad only needs to update a
+// few times a second for smooth-looking tracking. Capped to ~10fps here — see the
+// iOS overheating note in CLAUDE.md before removing this.
+const DETECT_INTERVAL_MS = 100;
+
 export function runDetectionLoop() {
   if (state.detectLoopHandle) cancelAnimationFrame(state.detectLoopHandle);
-  const step = () => {
-    if (video.readyState >= 2 && video._crop) {
+  let lastRun = 0;
+  const step = (timestamp) => {
+    if (video.readyState >= 2 && video._crop && timestamp - lastRun >= DETECT_INTERVAL_MS) {
+      lastRun = timestamp;
       detectQuad();
     }
     state.detectLoopHandle = requestAnimationFrame(step);

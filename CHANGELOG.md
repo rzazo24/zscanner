@@ -5,6 +5,23 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.14.2] - 2026-09-16
+
+### Changed
+
+- **Vuelve el límite de ~10 fps en el bucle de detección**, revertido en v0.12.2
+  junto con `ImageCapture.takePhoto()` por precaución (ver esa entrada). Se
+  reintroduce ahora solo, sin tocar la captura, tras confirmar con el usuario que
+  el móvil se calienta y a veces se bloquea con la app abierta un rato *aunque no
+  se capture nada* — un patrón que apunta al bucle de detección corriendo CLAHE +
+  Canny + contornos en cada `requestAnimationFrame` (hasta 120 Hz en iPhones con
+  ProMotion) más que a la API de captura, que ya no está en el código desde el
+  revert anterior. Verificado con Playwright que el bucle corre a ~9.9 fps tras el
+  cambio y que la detección, el flujo de galería y la sesión multipágina siguen
+  funcionando sin errores de consola. **Pendiente de confirmar en un iPhone real**
+  si esto resuelve el calentamiento/bloqueo — no se puede verificar ese punto
+  específico desde aquí.
+
 ## [0.14.1] - 2026-09-16
 
 ### Fixed

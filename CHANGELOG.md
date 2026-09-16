@@ -5,6 +5,17 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.13.3] - 2026-09-16
+
+### Fixed
+
+- El botón de galería (en su propia fila desde v0.13.2) se quedaba visible en
+  todas las pantallas, montado encima del selector de modo en la de resultado
+  — las funciones que cambian de pantalla (`ui.js`) solo ocultaban
+  `#live-controls`, y esa fila nueva es un elemento hermano aparte que nunca
+  se añadió a esa lógica. Ahora se oculta/muestra junto con el resto de
+  controles de la vista en vivo.
+
 ## [0.13.2] - 2026-09-16
 
 ### Changed
@@ -308,7 +319,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   contornos → `approxPolyDP`), corrección de perspectiva, tres modos de salida
   (blanco y negro, escala de grises, color) y descarga como PNG.
 
-[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.13.2...HEAD
+[Unreleased]: https://github.com/rzazo24/zscanner/compare/v0.13.3...HEAD
+[0.13.3]: https://github.com/rzazo24/zscanner/compare/v0.13.2...v0.13.3
 [0.13.2]: https://github.com/rzazo24/zscanner/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/rzazo24/zscanner/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/rzazo24/zscanner/compare/v0.12.2...v0.13.0

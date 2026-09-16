@@ -12,6 +12,7 @@ export const switchCamBtn = document.getElementById('switch-cam');
 export const galleryBtn = document.getElementById('gallery-btn');
 export const galleryInput = document.getElementById('gallery-input');
 export const liveControls = document.getElementById('live-controls');
+export const liveControlsSecondary = document.getElementById('live-controls-secondary');
 export const resultPanel = document.getElementById('result-panel');
 export const resultCanvas = document.getElementById('result-canvas');
 export const retakeBtn = document.getElementById('retake-btn');

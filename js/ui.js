@@ -3,7 +3,7 @@
 // perspective logic so those modules can import it without creating cycles.
 
 import {
-  stageLive, stageAdjust, liveControls, adjustControls,
+  stageLive, stageAdjust, liveControls, liveControlsSecondary, adjustControls,
   hintText, adjustHint, resultPanel,
 } from './dom.js';
 
@@ -11,6 +11,7 @@ export function showLiveStage() {
   stageLive.classList.remove('hidden');
   stageAdjust.classList.add('hidden');
   liveControls.style.display = 'flex';
+  liveControlsSecondary.style.display = 'flex';
   adjustControls.style.display = 'none';
   hintText.style.display = 'block';
   adjustHint.style.display = 'none';
@@ -21,6 +22,7 @@ export function showAdjustStage() {
   stageLive.classList.add('hidden');
   stageAdjust.classList.remove('hidden');
   liveControls.style.display = 'none';
+  liveControlsSecondary.style.display = 'none';
   adjustControls.style.display = 'flex';
   hintText.style.display = 'none';
   adjustHint.style.display = 'block';
@@ -31,6 +33,7 @@ export function showResultStage() {
   stageLive.classList.add('hidden');
   stageAdjust.classList.add('hidden');
   liveControls.style.display = 'none';
+  liveControlsSecondary.style.display = 'none';
   adjustControls.style.display = 'none';
   hintText.style.display = 'none';
   adjustHint.style.display = 'none';

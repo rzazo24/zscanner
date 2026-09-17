@@ -294,7 +294,18 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
   font-size: 0.8rem;
   letter-spacing: 0.2px;
   margin-top: 6px;
-  min-height: 1.2em;
+  /* Fixed at exactly the tallest message's rendered height (2 lines, measured via
+     Playwright across the three hint messages at 320/375/390px widths — 34px was
+     the max in every case) rather than min-height:1.2em (one line's worth), which
+     let the box grow/shrink as detection swapped between one-line and two-line
+     messages ("Mantén el encuadre..." vs "Apunta a un documento..."), visibly
+     shifting #controls-area's centered buttons up and down beneath it. Centering a
+     shorter message inside this fixed box (instead of leaving it top-aligned with
+     empty space below) is what display:flex + align-items:center is for here. */
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Result view */

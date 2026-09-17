@@ -5,6 +5,18 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.15.3] - 2026-09-17
+
+### Fixed
+
+- Los botones de la cámara (y los del resultado) se desplazaban ligeramente hacia
+  arriba o abajo según el mensaje mostrado bajo el visor: algunos textos ocupan una
+  línea y otros dos, y al centrarse los botones en el espacio libre, ese cambio de
+  altura del texto los movía con cada actualización del estado de detección. Ahora
+  el texto de ayuda reserva siempre la altura de dos líneas (el caso más alto
+  posible, medido directamente), así que los botones quedan fijos sin importar qué
+  mensaje se muestre.
+
 ## [0.15.2] - 2026-09-17
 
 ### Changed

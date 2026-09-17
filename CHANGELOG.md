@@ -5,6 +5,17 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.15.5] - 2026-09-17
+
+### Changed
+
+- El texto de ayuda bajo el visor (los tres mensajes de detección, y el de la
+  vista de ajuste manual) se reduce de tamaño y ahora cabe siempre en una sola
+  línea, en vez de partirse en dos según el mensaje y el ancho de pantalla —
+  verificado en varios anchos, incluyendo el más estrecho probado (320px). De
+  paso, al ocupar menos alto, mejora también el margen de seguridad del footer
+  en la pantalla más baja probada (de ~7px a ~14px).
+
 ## [0.15.4] - 2026-09-17
 
 ### Changed

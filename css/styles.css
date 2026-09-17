@@ -296,18 +296,22 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .hint-text {
   text-align: center;
   color: var(--text-dim);
-  font-size: 0.8rem;
-  letter-spacing: 0.2px;
+  /* 0.58rem + no letter-spacing is the largest size that keeps all three hint
+     messages (js/detection.js) on a single line at every tested width down to
+     320px — confirmed empirically: letter-spacing alone was enough to push the
+     longest message ("Apunta a un documento...") onto 2 lines as small as
+     0.72rem, but removing it let sizes as large as ~0.66rem still fit at 375px+
+     (just not at 320px). Don't reintroduce letter-spacing here without re-checking
+     — it costs more single-line headroom than font-size itself does. */
+  font-size: 0.58rem;
   margin-top: 6px;
-  /* Fixed at exactly the tallest message's rendered height (2 lines, measured via
-     Playwright across the three hint messages at 320/375/390px widths — 34px was
-     the max in every case) rather than min-height:1.2em (one line's worth), which
-     let the box grow/shrink as detection swapped between one-line and two-line
-     messages ("Mantén el encuadre..." vs "Apunta a un documento..."), visibly
-     shifting #controls-area's centered buttons up and down beneath it. Centering a
-     shorter message inside this fixed box (instead of leaving it top-aligned with
-     empty space below) is what display:flex + align-items:center is for here. */
-  height: 34px;
+  /* Fixed at exactly the (now single-line, ~13px) rendered height, same reasoning
+     as before this size change: a min-height would let the box grow if a message
+     ever did wrap, and #controls-area centering in the space below would visibly
+     shift the buttons every time that happened (see the v0.15.3 note in
+     CLAUDE.md). Centering a shorter message inside this fixed box (instead of
+     leaving it top-aligned) is what display:flex + align-items:center is for. */
+  height: 14px;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -455,9 +455,15 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .pages-bar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 10px;
-  margin-bottom: 10px;
+  gap: 8px;
+  padding: 4px 8px;
+  /* fit-content + centered instead of stretching the full .app width — with
+     typically just a couple of small thumbnails plus the count/button, a
+     full-width bar left a large empty gap in the middle. max-width caps it back
+     to 100% for the rare case of many thumbnails pushing past the container. */
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto 8px;
   background: var(--panel-bg);
   border: 1px solid var(--grid);
   border-radius: 8px;
@@ -465,16 +471,18 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .pages-bar.hidden { display: none; }
 .pages-thumbs {
   display: flex;
-  gap: 6px;
+  gap: 5px;
   overflow-x: auto;
-  flex: 1;
-  min-width: 0;
+  /* Caps how wide the thumbnail strip alone can grow before scrolling internally,
+     so a many-page session scrolls its thumbnails instead of stretching the whole
+     bar (and therefore the empty gap next to it) edge-to-edge again. */
+  max-width: 160px;
 }
 .page-thumb {
   position: relative;
   flex: none;
-  width: 28px;
-  height: 38px;
+  width: 22px;
+  height: 30px;
   border-radius: 3px;
   overflow: hidden;
   border: 1px solid var(--grid);
@@ -483,10 +491,10 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .page-thumb-remove {
   position: absolute;
   top: 0; right: 0;
-  width: 16px; height: 16px;
+  width: 14px; height: 14px;
   background: rgba(10, 15, 10, 0.85);
   color: var(--red);
-  font-size: 12px;
+  font-size: 10px;
   line-height: 1;
   border-radius: 0 0 0 4px;
   padding: 0;
@@ -495,21 +503,21 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 4px;
+  gap: 3px;
   flex: none;
 }
 #pages-count {
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   color: var(--text-dim);
   white-space: nowrap;
 }
 #finish-pdf-btn {
-  padding: 6px 12px;
+  padding: 4px 10px;
   border-radius: 4px;
   background: var(--accent);
   border: 1px solid var(--accent);
   color: #06170a;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
   white-space: nowrap;
 }

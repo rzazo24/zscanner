@@ -5,6 +5,17 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.15.2] - 2026-09-17
+
+### Changed
+
+- La barra de páginas de la sesión multipágina ocupaba todo el ancho disponible
+  aunque solo tuviera una miniatura, dejando un hueco vacío grande entre esta y
+  "Finalizar PDF". Ahora la barra se ajusta a su contenido (ancho automático,
+  centrada, con tope al 100% si hay muchas páginas) en vez de estirarse siempre
+  al ancho completo, y se reducen miniaturas, paddings y tamaños de fuente para
+  que ocupe menos alto también.
+
 ## [0.15.1] - 2026-09-16
 
 ### Changed

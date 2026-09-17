@@ -66,8 +66,13 @@ header {
      (#live-controls + #live-controls-secondary) — using gap here instead of a
      margin on the children themselves, so a leading/trailing margin doesn't throw
      off the centering above (a margin on the first or last visible child would
-     count on one side only, making the leftover space split unevenly). */
-  gap: 6px;
+     count on one side only, making the leftover space split unevenly). 18px here
+     matches #live-controls' own 18px column gap exactly (measured edge-to-edge,
+     shutter-bottom to gallery-btn-top vs. switch-cam-right to shutter-left) —
+     picked to make the vertical gap under the shutter match the horizontal gaps
+     beside it, so the 4 buttons read as evenly spaced in both directions instead
+     of tightly packed on top with a much smaller gap below. */
+  gap: 18px;
 }
 
 .app-footer {

@@ -5,6 +5,16 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.15.4] - 2026-09-17
+
+### Changed
+
+- El hueco vertical entre la fila superior de botones (cambiar cámara/disparador/
+  ajustar) y el botón de galería era mucho más pequeño (6px) que el hueco
+  horizontal entre los botones de esa fila (18px), así que el conjunto se veía
+  descompensado. Ahora ambos huecos miden lo mismo (18px), para que los 4 botones
+  queden espaciados de forma simétrica en las dos direcciones.
+
 ## [0.15.3] - 2026-09-17
 
 ### Fixed

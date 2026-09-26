@@ -52,6 +52,91 @@ function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
 
 function toOdd(n) { n = Math.round(n); return n % 2 === 0 ? n + 1 : n; }
 
+// Percentile-based contrast stretch for a single 8-bit channel: clips the darkest
+// blackPercentile% and brightest (100-whitePercentile)% of *pixel count* to pure
+// black/white, then linearly stretches the rest — instead of cv.normalize's
+// NORM_MINMAX, which anchors the whole range to the single darkest and single
+// brightest pixel in the image. A lone sensor-noise speckle or a small bright
+// reflection can already BE that one pixel, silently ruining the stretch for
+// everything else; percentile clipping ignores that handful of outliers instead of
+// being defined by them. Technique (and the 2%/99.5% defaults used below) adapted
+// from OSS-DocumentScanner's WhitePaperTransform `contrastStretch` — same idea,
+// reimplemented directly against OpenCV.js (`cv.calcHist`/`cv.LUT`, confirmed
+// working via a Playwright round-trip test before writing this, not assumed from
+// the C++ API alone).
+function percentileStretch(channel, blackPercentile, whitePercentile) {
+  const totalPixels = channel.rows * channel.cols;
+  const blackCount = totalPixels * blackPercentile / 100;
+  const whiteCount = totalPixels * whitePercentile / 100;
+  let srcVec, mask, hist, lut, stretched;
+  try {
+    srcVec = new cv.MatVector();
+    srcVec.push_back(channel);
+    mask = new cv.Mat();
+    hist = new cv.Mat();
+    cv.calcHist(srcVec, [0], mask, hist, [256], [0, 256]);
+
+    let blackIndex = 0;
+    let cumulative = 0;
+    for (let i = 0; i < 256; i++) {
+      cumulative += hist.floatPtr(i, 0)[0];
+      if (cumulative > blackCount) { blackIndex = i; break; }
+    }
+    let whiteIndex = 255;
+    cumulative = 0;
+    for (let i = 255; i >= 0; i--) {
+      cumulative += hist.floatPtr(i, 0)[0];
+      if (cumulative > totalPixels - whiteCount) { whiteIndex = i; break; }
+    }
+
+    lut = new cv.Mat(1, 256, cv.CV_8UC1);
+    const range = whiteIndex - blackIndex;
+    for (let i = 0; i < 256; i++) {
+      lut.ucharPtr(0, i)[0] = i < blackIndex ? 0
+        : i > whiteIndex ? 255
+        : range > 0 ? Math.round((i - blackIndex) / range * 255)
+        : 0;
+    }
+    stretched = new cv.Mat();
+    cv.LUT(channel, lut, stretched);
+    return stretched;
+  } finally {
+    [srcVec, mask, hist, lut].forEach(m => m && m.delete());
+  }
+}
+
+// "Color" mode's white-balance correction: stretches each of R/G/B independently
+// (never alpha) via percentileStretch, correcting the warm/yellow cast typical of
+// indoor lighting — the raw capture had no color processing at all before this.
+// Gentler percentiles than the grayscale "Mejorado" stretch above (1%/99% vs.
+// 2%/99.5%): this runs on the actual photographed colors, not an already
+// background-flattened document, so a more aggressive clip risks visibly shifting
+// hues instead of just correcting a lighting cast.
+function colorBalance(rgba) {
+  // MatVector.get(i) returns its own independent Mat handle, not just a view that
+  // dies with the vector — confirmed empirically (read + explicit .delete() on a
+  // channel both still worked fine *after* deleting the vector it came from), so
+  // r/g/b/a each need their own delete below alongside the vectors themselves, or
+  // this leaks 4 Mats every render instead of the 0 a leak-free version would.
+  let channels, r, g, b, a, stretchedR, stretchedG, stretchedB, outVec, out;
+  try {
+    channels = new cv.MatVector();
+    cv.split(rgba, channels);
+    r = channels.get(0); g = channels.get(1); b = channels.get(2); a = channels.get(3);
+    stretchedR = percentileStretch(r, 1, 99);
+    stretchedG = percentileStretch(g, 1, 99);
+    stretchedB = percentileStretch(b, 1, 99);
+    outVec = new cv.MatVector();
+    outVec.push_back(stretchedR); outVec.push_back(stretchedG);
+    outVec.push_back(stretchedB); outVec.push_back(a);
+    out = new cv.Mat();
+    cv.merge(outVec, out);
+    return out;
+  } finally {
+    [channels, r, g, b, a, stretchedR, stretchedG, stretchedB, outVec].forEach(m => m && m.delete());
+  }
+}
+
 // adaptiveThreshold's blockSize is a pixel count, not a proportion of the image — a
 // fixed value implicitly assumes a fixed capture resolution. 25 was tuned against the
 // ~1400px-wide shots this app used to produce; at the higher resolutions introduced in
@@ -70,11 +155,13 @@ function adaptiveBlockSize(width) {
 // Classic background-normalization recipe: estimate the page's own illumination by
 // heavily blurring a dilated copy (this erases text/fine detail, keeping only the
 // large-scale lighting), subtract that estimate from the original to flatten it out,
-// then normalize (this is the "escalado" — a min/max contrast stretch) so the paper
-// reads as clean white and ink as dark. Kernel sizes scale with image width, same
-// reasoning as adaptiveBlockSize above — tuned by visual comparison against a
-// synthetic image with a real shadow gradient and camera-sensor-like noise, not
-// copied blind from a tutorial pinned to some other resolution.
+// then contrast-stretch (this is the "escalado") so the paper reads as clean white
+// and ink as dark — percentileStretch (2%/99.5%) rather than a plain min/max
+// normalize, for the same outlier-robustness reason described on percentileStretch
+// itself. Kernel sizes scale with image width, same reasoning as adaptiveBlockSize
+// above — tuned by visual comparison against a synthetic image with a real shadow
+// gradient and camera-sensor-like noise, not copied blind from a tutorial pinned to
+// some other resolution.
 function enhancedGray(gray, width) {
   const dilateSize = Math.max(3, toOdd(width / 200));
   const medianSize = Math.max(3, toOdd(width / 70));
@@ -89,8 +176,7 @@ function enhancedGray(gray, width) {
     cv.absdiff(gray, bg, diff);
     inv = new cv.Mat();
     cv.bitwise_not(diff, inv);
-    norm = new cv.Mat();
-    cv.normalize(inv, norm, 0, 255, cv.NORM_MINMAX);
+    norm = percentileStretch(inv, 2, 99.5);
     return norm;
   } finally {
     [kernel, dilated, bg, diff, inv].forEach(m => m && m.delete());
@@ -99,10 +185,11 @@ function enhancedGray(gray, width) {
 
 export function renderResult() {
   if (!state.lastWarpedMat) return;
-  let out = new cv.Mat();
+  let out;
   if (state.currentMode === 'color') {
-    state.lastWarpedMat.copyTo(out);
+    out = colorBalance(state.lastWarpedMat);
   } else {
+    out = new cv.Mat();
     let gray = new cv.Mat();
     cv.cvtColor(state.lastWarpedMat, gray, cv.COLOR_RGBA2GRAY);
     if (state.currentMode === 'gray') {

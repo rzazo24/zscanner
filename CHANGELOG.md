@@ -5,6 +5,30 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-09-26
+
+### Added
+
+- Modo "Color" corrige ahora el tono cálido/amarillento típico de la luz interior
+  (estirado de contraste por percentil aplicado a cada canal R/G/B por separado),
+  en vez de mostrar la foto tal cual salió de la cámara sin ningún procesado.
+
+### Changed
+
+- El estirado de contraste del modo "Mejorado" pasa de un min/max puro
+  (`cv.normalize` con `NORM_MINMAX`) a un estirado por percentil del histograma
+  (recorta el 2% más oscuro y el 0.5% más claro antes de estirar) — mucho más
+  robusto ante un solo píxel de ruido del sensor o un reflejo puntual, que antes
+  podían anclar todo el rango y dejar la imagen sin apenas estirar. Verificado con
+  una imagen sintética de bajo contraste con dos píxeles atípicos (uno negro puro,
+  uno blanco puro): el `normalize` antiguo no cambiaba nada (100→100, 140→140,
+  179→179), el nuevo estirado por percentil corrige correctamente todo el rango
+  real (100→0, 140→126, 179→255). Sin coste de rendimiento apreciable (93ms vs
+  90ms en una imagen de 2400×3200).
+- Técnica adaptada de `WhitePaperTransform` en
+  [OSS-DocumentScanner](https://github.com/ossappscollective/OSS-DocumentScanner),
+  reimplementada directamente contra OpenCV.js (no es una dependencia nueva).
+
 ## [0.15.5] - 2026-09-17
 
 ### Changed

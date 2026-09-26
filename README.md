@@ -1,6 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
-![Version](https://img.shields.io/badge/version-0.15.5-3ef27a?style=flat)
+![Version](https://img.shields.io/badge/version-0.16.0-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -80,11 +80,16 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
     es blanco y negro puro, sino gris continuo con fondo blanco limpio y sin el dentado
     de una umbralización dura. Técnica clásica de normalización de fondo: estima la
     iluminación con un desenfoque fuerte, la resta de la imagen original y estira el
-    contraste al resultado.
+    contraste al resultado — por percentil del histograma (recorta el 2% más oscuro y
+    el 0.5% más claro antes de estirar) en vez de min/max puro, así un solo píxel de
+    ruido o un reflejo puntual no arruina el estirado de todo lo demás.
   - **B/N**: umbralización adaptativa (`adaptiveThreshold`, con el tamaño de bloque
     escalado a la resolución real del recorte para no verse ruidoso a resoluciones de
     captura más altas) — blanco y negro puro, máximo contraste, archivo más pequeño.
-  - **Grises** y **Color**: sin procesado adicional.
+  - **Color**: el mismo estirado por percentil que "Mejorado", aplicado a cada canal
+    (rojo/verde/azul) por separado — corrige el tono cálido/amarillento típico de la
+    luz interior en vez de dejar la foto tal cual salió de la cámara.
+  - **Grises**: sin procesado adicional.
 - Se pueden encadenar varias páginas en una misma sesión: el botón "+ Página" del
   resultado la guarda (en el modo de salida que tuviera en ese momento) y vuelve a la
   cámara para la siguiente, con una barra de miniaturas (quitar una página con su ×)
@@ -165,6 +170,10 @@ con el valor aplicándose en vivo al siguiente frame.
 - Única dependencia de terceros aparte de OpenCV.js: [jsPDF](https://github.com/parallax/jsPDF)
   (CDN, cargado bajo demanda solo al generar un PDF multipágina).
 - Pensado para desplegarse como sitio estático en Vercel.
+- El estirado de contraste por percentil (modos "Mejorado" y "Color") está inspirado
+  en la técnica `WhitePaperTransform` de
+  [OSS-DocumentScanner](https://github.com/ossappscollective/OSS-DocumentScanner)
+  — reimplementada aquí directamente contra OpenCV.js, no copiada de su código C++.
 
 ## Estructura
 

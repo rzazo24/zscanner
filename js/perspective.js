@@ -5,6 +5,7 @@ import { resultCanvas, downloadBtn } from './dom.js';
 import { state } from './state.js';
 import { showResultStage } from './ui.js';
 import { grabFullFrame, quadFromDetection } from './adjust.js';
+import { saveOrShareFile } from './share.js';
 
 // Fast path: a quad is already locked in, so warp straight to the result
 // without the extra confirmation tap.
@@ -221,8 +222,7 @@ document.querySelectorAll('.mode-toggle button').forEach(btn => {
 });
 
 downloadBtn.addEventListener('click', () => {
-  const link = document.createElement('a');
-  link.download = 'documento-escaneado.png';
-  link.href = resultCanvas.toDataURL('image/png');
-  link.click();
+  resultCanvas.toBlob((blob) => {
+    saveOrShareFile(blob, 'documento-escaneado.png', 'image/png');
+  }, 'image/png');
 });

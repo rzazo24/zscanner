@@ -7,6 +7,7 @@
 
 import { pagesBar, pagesThumbs, pagesCount, resultCanvas } from './dom.js';
 import { state } from './state.js';
+import { saveOrShareFile } from './share.js';
 
 // Snapshots whatever is currently shown in the result canvas (i.e. the current
 // capture in its currently-selected output mode) into the session. Each page keeps
@@ -118,5 +119,8 @@ export async function exportPagesAsPdf() {
     doc.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', offsetX, offsetY, drawW, drawH);
   });
 
-  doc.save('documento-escaneado.pdf');
+  // doc.save() drives its own <a download> internally, which has the same iOS
+  // Safari problem as the PNG download did (see share.js) — going through
+  // saveOrShareFile with the raw Blob instead gets the native share sheet there too.
+  await saveOrShareFile(doc.output('blob'), 'documento-escaneado.pdf', 'application/pdf');
 }

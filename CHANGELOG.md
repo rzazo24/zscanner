@@ -5,6 +5,22 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.16.1] - 2026-09-26
+
+### Fixed
+
+- El botón "Descargar PNG" (y "Finalizar PDF") no hacía nada en Safari de iOS —
+  reportado directamente por un usuario en un iPhone real. Ese navegador no
+  respeta de forma fiable el enlace `<a download>`, sobre todo con imágenes
+  grandes. Ahora, cuando el navegador lo soporta, se usa la Web Share API (abre
+  la hoja de compartir nativa, con "Guardar en Fotos"/"Guardar en Archivos" entre
+  las opciones) en vez de ese enlace; en navegadores sin esa API (la mayoría de
+  escritorio) se sigue usando el enlace de descarga de toda la vida, sin cambios
+  ahí. Verificado simulando `navigator.share`/`canShare` (Playwright no puede
+  probar Safari de iOS real): el PNG y el PDF llegan correctamente como archivo a
+  `navigator.share()` con nombre/tipo/tamaño correctos, y cancelar la hoja de
+  compartir no deja la app en un estado raro ni dispara nada por error.
+
 ## [0.16.0] - 2026-09-26
 
 ### Added

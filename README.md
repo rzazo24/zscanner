@@ -1,6 +1,6 @@
 # <img src="favicon.svg" width="30" height="30" align="absmiddle" alt=""> ZScanner
 
-![Version](https://img.shields.io/badge/version-0.16.0-3ef27a?style=flat)
+![Version](https://img.shields.io/badge/version-0.16.1-3ef27a?style=flat)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -99,6 +99,12 @@ Uno más de una serie de proyectos pequeños para portfolio, junto a
   que el documento se vea consistente en vez de cambiar de tamaño entre página y página
   por pequeñas diferencias de recorte — usando [jsPDF](https://github.com/parallax/jsPDF)
   cargado por CDN solo la primera vez que hace falta, no en cada visita.
+- Tanto el PNG como el PDF se guardan mediante la Web Share API cuando el navegador
+  la soporta con archivos (abre la hoja de compartir nativa, con "Guardar en
+  Fotos"/"Guardar en Archivos" entre las opciones) en vez de un enlace de descarga
+  clásico — Safari en iOS no siempre respeta ese enlace, sobre todo con imágenes
+  grandes. En navegadores sin esa API (la mayoría de escritorio) se sigue usando el
+  enlace de descarga de toda la vida.
 - Es una PWA instalable en el móvil (icono en pantalla de inicio, pantalla completa sin
   barra del navegador). Un service worker (`sw.js`) cachea el shell estático de la app
   (HTML/CSS/JS/iconos) con estrategia stale-while-revalidate, para que cargue al instante
@@ -190,6 +196,7 @@ zscanner/
 │   ├── adjust.js          # esquinas arrastrables sobre el frame congelado
 │   ├── perspective.js      # warpPerspective + modos de salida + descarga
 │   ├── pages.js             # sesión multipágina: miniaturas + exportar PDF (jsPDF)
+│   ├── share.js              # guardar/compartir un archivo (Web Share API o descarga clásica)
 │   └── main.js               # orquestación: carga de OpenCV.js, SW y listeners de botones
 ├── icons/                  # iconos de la PWA (192/512/512-maskable/apple-touch-icon)
 ├── index.html

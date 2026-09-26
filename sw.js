@@ -8,7 +8,7 @@
 // Sube CACHE_NAME (y el número de versión en CHANGELOG.md/README) en cada despliegue con
 // cambios visibles en index.html/css/js — es lo único que hace que el navegador note una
 // versión nueva del service worker y dispare el aviso de "Recargar" (ver main.js).
-const CACHE_NAME = 'zscanner-v0.16.0';
+const CACHE_NAME = 'zscanner-v0.16.1';
 const SHELL_FILES = [
   '/',
   '/index.html',
@@ -21,6 +21,7 @@ const SHELL_FILES = [
   '/js/adjust.js',
   '/js/perspective.js',
   '/js/pages.js',
+  '/js/share.js',
   '/js/main.js',
   '/manifest.webmanifest',
   '/favicon.svg',
